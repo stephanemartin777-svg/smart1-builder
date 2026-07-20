@@ -1,0 +1,923 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>S.MART1 Builder — Stéphane Martin</title>
+<meta name="description" content="S.MART1 Builder. Sites vitrines, webapps, automatisation et conseil no-code. Cliquez sur les écrans du poste de pilotage pour explorer.">
+<style>
+:root{
+  --ink:#0d0a06;
+  --amber:#e0a24a;
+  --cream:#ede2cd;
+  --text-dim:#b8a98c;
+  --led:#ff4b3a;
+  --mono:ui-monospace,"SF Mono","JetBrains Mono",Menlo,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",system-ui,Roboto,Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;background:var(--ink);color:var(--cream);font-family:var(--sans)}
+
+.stage{
+  position:relative;
+  max-width:1200px;
+  margin:0 auto;
+  aspect-ratio:1672/941;
+  overflow:hidden;
+}
+.stage img.scene{
+  position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;
+}
+#gl,#birds{
+  position:absolute;inset:0;width:100%;height:100%;display:block;pointer-events:none;
+}
+#gl{opacity:0;transition:opacity .8s ease}
+#gl.ready{opacity:1}
+
+/* ============ HOTSPOTS ============ */
+.hotspot{
+  position:absolute;border:none;background:transparent;cursor:pointer;padding:0;
+  -webkit-tap-highlight-color:transparent;z-index:5;
+}
+.hotspot::after{
+  content:"";position:absolute;inset:0;border-radius:8px;
+  box-shadow:0 0 0 0 rgba(224,162,74,0);
+  transition:box-shadow .25s ease, background .25s ease;
+}
+.hotspot:hover::after{
+  background:rgba(224,162,74,.08);
+  box-shadow:0 0 24px 5px rgba(224,162,74,.35);
+}
+.hotspot.pulse::after{animation:pulse 1.1s ease}
+@keyframes pulse{
+  0%{box-shadow:0 0 0 0 rgba(224,162,74,.7)}
+  100%{box-shadow:0 0 30px 14px rgba(224,162,74,0)}
+}
+.hotspot.deny::after{animation:deny .5s ease}
+@keyframes deny{
+  0%,100%{box-shadow:0 0 0 0 rgba(255,75,58,0);transform:translateX(0)}
+  20%{box-shadow:0 0 26px 8px rgba(255,75,58,.5);transform:translateX(-4px)}
+  40%{transform:translateX(4px)}
+  60%{transform:translateX(-3px)}
+  80%{transform:translateX(2px)}
+}
+@media (prefers-reduced-motion: reduce){
+  .hotspot.pulse::after,.hotspot.deny::after{animation:none}
+}
+
+.spot-logo{ left:55.4%; top:8.5%; width:10.4%; height:21%; }
+.spot-about{ left:67.4%; top:6%; width:13.4%; height:23.5%; }
+.spot-portfolio{ left:82.4%; top:2.5%; width:16%; height:28%; }
+.spot-services{ left:55.4%; top:31.5%; width:10.4%; height:21%; }
+.spot-ideas{ left:67.4%; top:31.5%; width:13.4%; height:23%; }
+.spot-contact{ left:82.4%; top:34%; width:16%; height:22%; }
+.spot-walkman{ left:79%; top:68.5%; width:11.5%; height:11.5%; }
+
+.deny-flag{
+  position:absolute;left:67.4%;top:44%;width:13.4%;
+  display:none;justify-content:center;pointer-events:none;z-index:6;
+}
+.deny-flag span{
+  background:#160604;border:1px solid #5a1710;border-radius:3px;
+  color:var(--led);text-shadow:0 0 7px rgba(255,75,58,.6);
+  font-family:var(--mono);font-size:clamp(.5rem,1vw,.72rem);font-weight:700;
+  letter-spacing:.08em;padding:4px 10px;white-space:nowrap;
+}
+.deny-flag.show{display:flex}
+
+.music-note{
+  position:absolute;left:84%;top:63.5%;
+  font-size:clamp(.9rem,1.8vw,1.4rem);color:var(--amber);
+  text-shadow:0 0 10px rgba(224,162,74,.7);
+  display:none;pointer-events:none;z-index:6;
+}
+.music-note.show{display:block}
+@media (prefers-reduced-motion: no-preference){
+  .music-note.show{animation:bob 1.6s ease-in-out infinite}
+}
+@keyframes bob{
+  0%,100%{transform:translateY(0) rotate(-6deg)}
+  50%{transform:translateY(-7px) rotate(6deg)}
+}
+
+.hint{
+  text-align:center;color:var(--text-dim);font-family:var(--mono);
+  font-size:.72rem;letter-spacing:.08em;padding:14px 16px 0;
+}
+.hint .blink{color:var(--amber);animation:blink 2.2s steps(2) infinite}
+@keyframes blink{50%{opacity:.25}}
+@media (prefers-reduced-motion: reduce){.hint .blink{animation:none}}
+
+footer{
+  text-align:center;padding:26px 0 50px;color:var(--text-dim);
+  font-family:var(--mono);font-size:.78rem;line-height:1.9;
+}
+footer .credit{font-size:.62rem;opacity:.6}
+
+/* ============ MODALES (dossier crème) ============ */
+.modal-veil{
+  position:fixed;inset:0;background:rgba(6,4,2,.82);
+  display:none;align-items:flex-start;justify-content:center;
+  padding:5vh 16px;overflow-y:auto;z-index:50;
+}
+.modal-veil.open{display:flex}
+.modal{
+  background:#F7F5EF;color:#15171C;border:1px solid #E5E1D6;border-radius:14px;
+  max-width:760px;width:100%;padding:32px 30px;position:relative;
+  box-shadow:0 30px 80px rgba(0,0,0,.6);
+}
+.modal-close{
+  position:absolute;top:16px;right:16px;
+  background:none;border:1px solid #E5E1D6;color:#5C5F69;
+  width:32px;height:32px;border-radius:50%;cursor:pointer;font-size:1rem;
+  display:flex;align-items:center;justify-content:center;
+}
+.modal-close:hover{color:#15171C;border-color:#1F6B4C}
+.modal h2{color:#15171C;margin-top:0;font-size:1.4rem;letter-spacing:-.015em}
+.modal .eyebrow{
+  font-family:var(--mono);font-size:.7rem;letter-spacing:.16em;text-transform:uppercase;
+  color:#1F6B4C;font-weight:700;margin-bottom:10px;
+}
+.modal p{color:#15171C;line-height:1.6;font-size:1rem}
+.modal .dim{color:#5C5F69}
+
+.work{
+  background:#FFFFFF;border:1px solid #E5E1D6;border-radius:14px;
+  padding:24px 24px;margin-bottom:16px;
+}
+.work .tag{
+  display:inline-block;font-size:.66rem;letter-spacing:.14em;text-transform:uppercase;
+  font-weight:700;color:#1F6B4C;background:#E7F0EA;
+  padding:5px 12px;border-radius:999px;margin-bottom:12px;
+}
+.work h3{margin:0 0 4px;font-size:1.2rem;font-weight:700;color:#15171C;letter-spacing:-.01em}
+.work .sub{color:#5C5F69;font-size:.94rem;margin:0 0 14px}
+.work .k{
+  font-size:.68rem;letter-spacing:.12em;text-transform:uppercase;
+  color:#5C5F69;font-weight:700;margin:12px 0 3px;
+}
+.work p{font-size:.95rem;margin:0}
+.metrics{
+  display:flex;flex-wrap:wrap;gap:14px;margin-top:18px;padding-top:16px;border-top:1px solid #E5E1D6;
+}
+.metric{flex:1;min-width:110px}
+.metric .big{font-size:1.7rem;font-weight:700;color:#1F6B4C;letter-spacing:-.02em;line-height:1}
+.metric .cap{font-size:.8rem;color:#5C5F69;margin-top:5px}
+.others{display:grid;grid-template-columns:repeat(2,1fr);gap:14px}
+.mini{
+  background:#FFFFFF;border:1px solid #E5E1D6;border-radius:14px;padding:20px;
+}
+.mini h4{font-size:1rem;font-weight:650;margin:0 0 8px;color:#15171C}
+.mini p{font-size:.88rem;color:#5C5F69;margin:0}
+.mini .res{margin-top:10px;font-size:.84rem;font-weight:600;color:#1F6B4C}
+@media(max-width:560px){.others{grid-template-columns:1fr}}
+
+.field-row{margin-bottom:14px}
+.field-row label{
+  display:block;font-size:.72rem;letter-spacing:.1em;text-transform:uppercase;
+  font-weight:700;color:#5C5F69;margin-bottom:5px;
+}
+.field-row input,.field-row textarea{
+  width:100%;border:1px solid #E5E1D6;border-radius:8px;background:#FFFFFF;
+  padding:11px 13px;font-size:.95rem;font-family:var(--sans);color:#15171C;
+}
+.field-row input:focus,.field-row textarea:focus{outline:2px solid #1F6B4C;outline-offset:1px;border-color:#1F6B4C}
+.field-row textarea{min-height:90px;resize:vertical}
+.contact-btn{
+  display:inline-flex;align-items:center;gap:8px;
+  background:#1F6B4C;color:#fff;font-weight:700;text-decoration:none;
+  padding:12px 24px;border-radius:8px;font-size:.95rem;border:none;cursor:pointer;
+  font-family:var(--sans);
+}
+.contact-btn:hover{filter:brightness(1.1)}
+.form-note{font-size:.8rem;color:#5C5F69;margin-top:12px}
+
+.svc{display:flex;gap:14px;align-items:flex-start;background:#fff;border:1px solid #E5E1D6;border-radius:14px;padding:18px 20px;margin-bottom:12px}
+.svc .ico{
+  min-width:40px;height:40px;border-radius:9px;background:#E7F0EA;color:#1F6B4C;
+  display:flex;align-items:center;justify-content:center;font-size:1.1rem;font-weight:700;
+}
+.svc h4{margin:0 0 4px;font-size:1.02rem;color:#15171C}
+.svc p{margin:0;font-size:.9rem;color:#5C5F69}
+.toolchips{display:flex;flex-wrap:wrap;gap:8px;margin-top:18px}
+.chip{
+  background:#fff;border:1px solid #E5E1D6;border-radius:999px;
+  padding:7px 14px;font-size:.85rem;color:#15171C;
+}
+</style>
+</head>
+<body>
+
+<div class="stage" id="stage">
+  <img class="scene" id="fallbackScene" src="assets/scene-v2.jpg" alt="Poste de pilotage S.MART1 Builder : six écrans présentant le studio, avec Jax le whippet dans son panier et une baie vitrée sur une cité végétale">
+  <canvas id="gl"></canvas>
+  <canvas id="birds"></canvas>
+
+  <button class="hotspot spot-logo" id="btnLogo" aria-label="S.MART1 Builder" title="S.MART1 Builder"></button>
+  <button class="hotspot spot-about" id="btnAbout" aria-haspopup="dialog" aria-label="À propos" title="À propos"></button>
+  <button class="hotspot spot-portfolio" id="btnPortfolio" aria-haspopup="dialog" aria-label="Portfolio" title="Portfolio"></button>
+  <button class="hotspot spot-services" id="btnServices" aria-haspopup="dialog" aria-label="Services" title="Services"></button>
+  <button class="hotspot spot-ideas" id="btnIdeas" aria-label="Idées en cours" title="Idées en cours"></button>
+  <button class="hotspot spot-contact" id="btnContact" aria-haspopup="dialog" aria-label="Contact" title="Contact"></button>
+  <button class="hotspot spot-walkman" id="btnWalkman" aria-label="Écouter Sanctus Syncopation" title="Walkman · Sanctus Syncopation"></button>
+
+  <div class="deny-flag" id="denyFlag"><span>⛔ CHASSE GARDÉE</span></div>
+  <div class="music-note" id="musicNote">♪</div>
+
+  <audio id="walkmanAudio" src="assets/theme.m4a" preload="metadata" loop></audio>
+</div>
+
+<p class="hint"><span class="blink">▮</span> CLIQUEZ SUR LES ÉCRANS ET LE WALKMAN POUR EXPLORER</p>
+
+<footer>
+  S.MART1 BUILDER · STÉPHANE MARTIN · 2026<br>
+  <span class="credit">Musique originale : "Sanctus Syncopation" · <button id="btnLegal" style="background:none;border:none;color:inherit;font:inherit;text-decoration:underline;cursor:pointer;padding:0">Mentions légales &amp; confidentialité</button></span>
+</footer>
+
+<!-- Modal: Mentions légales -->
+<div class="modal-veil" id="modalLegal">
+  <div class="modal" style="max-width:640px" role="dialog" aria-modal="true" aria-label="Mentions légales et confidentialité">
+    <button class="modal-close" data-close>✕</button>
+    <div class="eyebrow">Mentions légales &amp; confidentialité</div>
+    <h2>Le cadre, en clair</h2>
+
+    <div class="work">
+      <span class="tag">Éditeur</span>
+      <p>Ce site est édité par Stéphane Martin, entrepreneur individuel, Lyon, France.<br>
+      Contact : stephane.martin777@gmail.com<br>
+      <span class="dim">[SIRET à compléter avant mise en ligne]</span></p>
+    </div>
+
+    <div class="work">
+      <span class="tag">Hébergement</span>
+      <p><span class="dim">[Hébergeur à compléter à la mise en ligne : nom, adresse, site web]</span></p>
+    </div>
+
+    <div class="work">
+      <span class="tag">Propriété intellectuelle</span>
+      <p>L'ensemble des contenus de ce site (textes, visuels, code, musique) est la propriété de Stéphane Martin, sauf mention contraire. Les visuels ont été créés avec l'assistance d'outils d'IA générative puis retravaillés. La musique "Sanctus Syncopation" est une création originale de l'éditeur, générée avec Suno. Toute reproduction sans autorisation est interdite.</p>
+    </div>
+
+    <div class="work">
+      <span class="tag">Données personnelles</span>
+      <p>Ce site ne dépose aucun cookie et n'utilise aucun traceur. Le formulaire de contact ouvre votre propre messagerie : aucune donnée n'est collectée, stockée ni transmise par le site lui-même. Les informations que vous choisissez d'envoyer par email servent uniquement à répondre à votre demande et ne sont jamais partagées avec des tiers. Conformément au RGPD, vous pouvez demander la suppression de vos données à tout moment à l'adresse de contact ci-dessus.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Portfolio -->
+<div class="modal-veil" id="modalPortfolio">
+  <div class="modal" role="dialog" aria-modal="true" aria-label="Portfolio">
+    <button class="modal-close" data-close>✕</button>
+    <div class="eyebrow">Portfolio · Projets &amp; réalisations</div>
+    <h2 style="margin-bottom:22px">Automatiser un métier de l'intérieur</h2>
+
+    <article class="work">
+      <span class="tag">Projet phare</span>
+      <h3>Relance automatisée d'un parcours de suivi</h3>
+      <p class="sub">Une méthode de relance déployée à l'échelle nationale.</p>
+      <div class="k">Le problème</div>
+      <p>La relance suivait une méthode différente selon la personne en charge, entièrement à la main.</p>
+      <div class="k">Ce qui a été construit</div>
+      <p>Une méthode structurée, classée par situation et documentée, réutilisable d'une équipe à l'autre.</p>
+      <div class="metrics">
+        <div class="metric"><div class="big">×5,5</div><div class="cap">de couverture, à effectif constant</div></div>
+        <div class="metric"><div class="big">centaines</div><div class="cap">de relances par jour, qualité homogène</div></div>
+      </div>
+    </article>
+
+    <article class="work">
+      <span class="tag">Extension navigateur · En service</span>
+      <h3>Synthèse de dossier en un clic</h3>
+      <p class="sub">Le bilan complet d'un dossier, généré instantanément.</p>
+      <div class="k">Le problème</div>
+      <p>Faire le point sur un dossier se faisait pièce par pièce, à la main, plusieurs heures à chaque fois.</p>
+      <div class="k">Ce qui a été construit</div>
+      <p>Une extension navigateur qui produit la synthèse complète et l'export en un clic, sans qu'aucune donnée ne quitte l'environnement sécurisé.</p>
+      <div class="metrics">
+        <div class="metric"><div class="big">1 clic</div><div class="cap">là où il fallait plusieurs heures</div></div>
+        <div class="metric"><div class="big">des dizaines d'heures</div><div class="cap">récupérées chaque mois à l'échelle d'une équipe</div></div>
+      </div>
+    </article>
+
+    <article class="work">
+      <span class="tag">Extension navigateur · En service</span>
+      <h3>Reporting mensuel automatisé</h3>
+      <p class="sub">Le rapport de suivi mensuel, produit et vérifié automatiquement.</p>
+      <div class="k">Le problème</div>
+      <p>Un rapport mensuel construit à la main par copier-coller, avec un vrai risque d'erreur et un résultat difficile à reproduire à l'identique.</p>
+      <div class="k">Ce qui a été construit</div>
+      <p>Une extension qui génère le rapport complet automatiquement, vérifiée ligne à ligne face à la version manuelle avant mise en service.</p>
+      <div class="metrics">
+        <div class="metric"><div class="big">≈25 jours</div><div class="cap">de travail récupérés par an</div></div>
+        <div class="metric"><div class="big">100 %</div><div class="cap">de correspondance avec la version manuelle</div></div>
+      </div>
+    </article>
+
+    <article class="work">
+      <span class="tag">Livré</span>
+      <h3>Migration de données assistée</h3>
+      <p class="sub">Des milliers de dossiers à rebasculer entre deux plateformes.</p>
+      <div class="k">Le problème</div>
+      <p>Après une migration de plateforme, environ 6 000 dossiers avaient perdu leurs informations clés. À la main : trois semaines de saisie à temps plein.</p>
+      <div class="k">Ce qui a été construit</div>
+      <p>Un traitement automatisé et supervisé, par petits lots, avec vérification systématique avant chaque écriture.</p>
+      <div class="metrics">
+        <div class="metric"><div class="big">~6 000</div><div class="cap">dossiers traités</div></div>
+        <div class="metric"><div class="big">3 semaines</div><div class="cap">de saisie manuelle évitées</div></div>
+      </div>
+    </article>
+
+    <div class="eyebrow" style="margin-top:28px">Autres réalisations</div>
+    <div class="others" style="margin-top:14px">
+      <div class="mini">
+        <h4>Sites Webflow complets</h4>
+        <p>CMS, blog, intégrations et automatisations, livrés en agence pour de vrais clients. Plusieurs mois de développement sur certains projets.</p>
+        <div class="res">Conçus, livrés, exploités</div>
+      </div>
+      <div class="mini">
+        <h4>Boutique e-commerce</h4>
+        <p>Shopify et print-on-demand, construite de A à Z : catalogue, tunnel de paiement, automatisation du contenu.</p>
+        <div class="res">De l'idée à la vente en ligne</div>
+      </div>
+      <div class="mini">
+        <h4>SnipeMyCar — agent de sourcing</h4>
+        <p>Un agent autonome qui surveille en continu les annonces de véhicules et alerte sur les bonnes affaires.</p>
+        <div class="res">Il chasse pendant que je dors</div>
+      </div>
+      <div class="mini">
+        <h4>Moneypenny — assistante IA</h4>
+        <p>Une assistante construite de A à Z sur Claude Code : agenda, mémoire, routines, veille quotidienne.</p>
+        <div class="res">IA appliquée, conçue sur mesure</div>
+      </div>
+      <div class="mini">
+        <h4>Chaîne de contenu automatisée</h4>
+        <p>Un blog qui collecte l'actualité par mots-clés, la réécrit proprement et la publie tout seul, site et Medium.</p>
+        <div class="res">Une chaîne qui tourne seule</div>
+      </div>
+      <div class="mini">
+        <h4>Agence de marketing digital</h4>
+        <p>Branding, contenu et réseaux sociaux pour des clients, pendant plusieurs années.</p>
+        <div class="res">Créée, développée, puis cédée</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: À propos -->
+<div class="modal-veil" id="modalAbout">
+  <div class="modal" style="max-width:640px" role="dialog" aria-modal="true" aria-label="À propos">
+    <button class="modal-close" data-close>✕</button>
+    <div class="eyebrow">À propos</div>
+    <h2>Qui je suis</h2>
+    <p>Stéphane Martin, Product Builder à Lyon. Je construis des produits digitaux de bout en bout : sites, webapps, automatisations, agents IA. Je pars d'un problème concret, je choisis l'outil le plus simple qui le résout vraiment, et je livre quelque chose qui tourne.</p>
+
+    <div class="work" style="margin-top:18px">
+      <span class="tag">Parcours</span>
+      <p>Entrepreneur avant tout : j'ai créé une agence de marketing digital, que j'ai développée pendant plusieurs années puis cédée. J'y ai conçu et livré de vrais sites complets sous Webflow : CMS, blog, intégrations, automatisations, référencement. Certains projets ont représenté plusieurs mois de développement, en production chez de vrais clients.</p>
+      <p style="margin-top:10px">Aujourd'hui, je conçois des outils de terrain, notamment pour le secteur de la santé : extensions navigateur, chaînes d'automatisation, assistants IA. Des outils utilisés tous les jours, qui font gagner des centaines d'heures par an.</p>
+    </div>
+
+    <div class="work">
+      <span class="tag">Formation</span>
+      <p>RNCP niveau 6, Mastère Cube : Airtable, Make, n8n, prompting avancé, IA appliquée, Claude Code, Bubble, Notion. La formation de référence du no-code en France.</p>
+    </div>
+
+    <div class="work">
+      <span class="tag">Ma méthode</span>
+      <p>L'IA n'est qu'un levier. La méthode, c'est :</p>
+      <ol style="margin:10px 0 0;padding-left:20px">
+        <li>Comprendre les vrais problèmes sur le terrain.</li>
+        <li>Construire vite.</li>
+        <li>Tester en réel.</li>
+        <li>Ne jamais rogner sur la sécurité des données.</li>
+      </ol>
+      <p style="margin-top:12px">L'idéal étant une immersion de quelques jours au sein des services pour comprendre le problème : c'est le meilleur moyen de le résoudre.</p>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Services -->
+<div class="modal-veil" id="modalServices">
+  <div class="modal" style="max-width:620px" role="dialog" aria-modal="true" aria-label="Services">
+    <button class="modal-close" data-close>✕</button>
+    <div class="eyebrow">Services</div>
+    <h2 style="margin-bottom:20px">Ce que je peux construire pour vous</h2>
+
+    <div class="svc">
+      <div class="ico">↻</div>
+      <div>
+        <h4>Optimisation de workflows &amp; process internes</h4>
+        <p>Mon terrain de jeu préféré : entrer dans une équipe, comprendre où le temps se perd vraiment, et reconstruire le processus pour qu'il tourne sans friction. C'est ce que je fais déjà au quotidien, et c'est ce que je préfère faire.</p>
+      </div>
+    </div>
+    <div class="svc">
+      <div class="ico">◧</div>
+      <div>
+        <h4>Sites web sur mesure</h4>
+        <p>Du site vitrine au site complexe sous Webflow ou en code : CMS, blog, intégrations, automatisations, référencement. J'ai livré des projets de plusieurs mois comme des lancements express.</p>
+      </div>
+    </div>
+    <div class="svc">
+      <div class="ico">▤</div>
+      <div>
+        <h4>Webapps et outils métier</h4>
+        <p>Tableaux de bord, formulaires intelligents, extensions navigateur, outils internes : tout ce qui remplace les fichiers Excel qui débordent et les copier-coller sans fin.</p>
+      </div>
+    </div>
+    <div class="svc">
+      <div class="ico">⚙</div>
+      <div>
+        <h4>Automatisation et agents IA</h4>
+        <p>Relances, collecte, tri, rapports, chaînes de contenu qui publient toutes seules, agents qui surveillent et alertent. Ce qui est répétitif disparaît de votre journée.</p>
+      </div>
+    </div>
+    <div class="svc">
+      <div class="ico">▣</div>
+      <div>
+        <h4>E-commerce</h4>
+        <p>Boutiques Shopify complètes : catalogue, print-on-demand, tunnel de paiement, automatisation des fiches produits et du contenu.</p>
+      </div>
+    </div>
+    <div class="svc">
+      <div class="ico">✦</div>
+      <div>
+        <h4>Conseil et accompagnement IA / no-code</h4>
+        <p>Choisir l'outil le plus simple qui résout vraiment votre problème, mettre en place la solution, et vous rendre autonome dessus.</p>
+      </div>
+    </div>
+
+    <div class="toolchips">
+      <span class="chip">Claude</span>
+      <span class="chip">Claude Code</span>
+      <span class="chip">GPT</span>
+      <span class="chip">Codex</span>
+      <span class="chip">GPT Vision</span>
+      <span class="chip">OpenClaw</span>
+      <span class="chip">Airtable</span>
+      <span class="chip">Make</span>
+      <span class="chip">n8n</span>
+      <span class="chip">Webflow</span>
+      <span class="chip">Shopify</span>
+      <span class="chip">HTML/CSS/JS</span>
+      <span class="chip">API &amp; Webhooks</span>
+    </div>
+  </div>
+</div>
+
+<!-- Modal: Contact -->
+<div class="modal-veil" id="modalContact">
+  <div class="modal" style="max-width:520px" role="dialog" aria-modal="true" aria-label="Contact">
+    <button class="modal-close" data-close>✕</button>
+    <div class="eyebrow">Contact</div>
+    <h2>Discutons de votre projet</h2>
+    <p class="dim" style="margin-bottom:20px">Laissez vos coordonnées et quelques mots, je vous recontacte rapidement.</p>
+
+    <div class="field-row">
+      <label for="cName">Votre nom</label>
+      <input id="cName" type="text" autocomplete="name" placeholder="Jean Dupont">
+    </div>
+    <div class="field-row">
+      <label for="cEmail">Votre email</label>
+      <input id="cEmail" type="email" autocomplete="email" placeholder="jean@exemple.fr">
+    </div>
+    <div class="field-row">
+      <label for="cPhone">Votre téléphone (optionnel)</label>
+      <input id="cPhone" type="tel" autocomplete="tel" placeholder="06 12 34 56 78">
+    </div>
+    <div class="field-row">
+      <label for="cMsg">Votre projet en quelques mots</label>
+      <textarea id="cMsg" placeholder="Je voudrais automatiser..."></textarea>
+    </div>
+    <button class="contact-btn" id="sendContact">Envoyer le message</button>
+    <p class="form-note">Le bouton ouvre votre messagerie avec le message prérempli. Rien n'est envoyé sans votre validation.</p>
+  </div>
+</div>
+
+<script src="assets/three.min.js"></script>
+<script>
+(function(){
+  var lastTrigger = null;
+  var audioCtx = null;
+  var reduced = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  /* ============ SONS ============ */
+  function ctx(){
+    if(!audioCtx){
+      var AC = window.AudioContext || window.webkitAudioContext;
+      if(AC) audioCtx = new AC();
+    }
+    return audioCtx;
+  }
+  function tone(freq, start, dur, type, gain){
+    var c = ctx(); if(!c) return;
+    var o = c.createOscillator(), g = c.createGain();
+    o.type = type || 'sine';
+    o.frequency.value = freq;
+    g.gain.setValueAtTime(0, c.currentTime + start);
+    g.gain.linearRampToValueAtTime(gain || .18, c.currentTime + start + .02);
+    g.gain.exponentialRampToValueAtTime(.001, c.currentTime + start + dur);
+    o.connect(g); g.connect(c.destination);
+    o.start(c.currentTime + start);
+    o.stop(c.currentTime + start + dur + .05);
+  }
+  function soundLogo(){
+    tone(523.25, 0, .3, 'sine', .16);
+    tone(659.25, .12, .3, 'sine', .14);
+    tone(783.99, .24, .45, 'sine', .16);
+  }
+  function soundDeny(){
+    tone(130, 0, .16, 'square', .12);
+    tone(98, .2, .3, 'square', .14);
+  }
+  function soundClick(){
+    tone(1250, 0, .04, 'square', .05);
+    tone(640, .012, .05, 'sine', .06);
+  }
+
+  /* Ambiance sonore de la piece : souffle doux + oiseaux + trafic lointain, coupe quand un ecran est ouvert */
+  var ambient = {started:false, gain:null, active:false};
+  function startAmbient(){
+    if(ambient.started) return;
+    var c = ctx(); if(!c) return;
+
+    /* souffle de fond */
+    var len = 2 * c.sampleRate;
+    var buf = c.createBuffer(1, len, c.sampleRate);
+    var d = buf.getChannelData(0);
+    var last = 0;
+    for(var i = 0; i < len; i++){
+      var w = Math.random() * 2 - 1;
+      d[i] = (last + 0.02 * w) / 1.02;
+      last = d[i];
+      d[i] *= 3.5;
+    }
+    var src = c.createBufferSource();
+    src.buffer = buf; src.loop = true;
+    var filt = c.createBiquadFilter();
+    filt.type = 'lowpass'; filt.frequency.value = 300; filt.Q.value = 0.4;
+    var g = c.createGain(); g.gain.value = 0;
+    var lfo = c.createOscillator(); lfo.frequency.value = 0.07;
+    var lfoGain = c.createGain(); lfoGain.gain.value = 0.008;
+    lfo.connect(lfoGain); lfoGain.connect(g.gain);
+    src.connect(filt); filt.connect(g); g.connect(c.destination);
+    src.start(); lfo.start();
+
+    /* bruit de circulation tres lointain, continu et tres bas */
+    var trafficLen = 4 * c.sampleRate;
+    var trafficBuf = c.createBuffer(1, trafficLen, c.sampleRate);
+    var td = trafficBuf.getChannelData(0);
+    var tlast = 0;
+    for(var j = 0; j < trafficLen; j++){
+      var tw = Math.random() * 2 - 1;
+      td[j] = (tlast + 0.01 * tw) / 1.01;
+      tlast = td[j];
+    }
+    var tsrc = c.createBufferSource();
+    tsrc.buffer = trafficBuf; tsrc.loop = true;
+    var tfilt = c.createBiquadFilter();
+    tfilt.type = 'lowpass'; tfilt.frequency.value = 180;
+    var tgain = c.createGain(); tgain.gain.value = 0;
+    tsrc.connect(tfilt); tfilt.connect(tgain); tgain.connect(c.destination);
+    tsrc.start();
+
+    ambient.gain = g;
+    ambient.trafficGain = tgain;
+    ambient.started = true;
+    scheduleBird();
+    updateAmbient();
+  }
+
+  function chirp(){
+    var c = ctx(); if(!c || !ambient.active) return;
+    var base = 2400 + Math.random() * 1400;
+    var notes = 2 + Math.floor(Math.random() * 3);
+    for(var n = 0; n < notes; n++){
+      (function(k){
+        var t0 = k * 0.09;
+        var o = c.createOscillator(), g = c.createGain();
+        o.type = 'sine';
+        var f0 = base + (Math.random()-0.5) * 300;
+        o.frequency.setValueAtTime(f0, c.currentTime + t0);
+        o.frequency.exponentialRampToValueAtTime(f0 * 1.4, c.currentTime + t0 + 0.05);
+        o.frequency.exponentialRampToValueAtTime(f0 * 0.9, c.currentTime + t0 + 0.1);
+        g.gain.setValueAtTime(0, c.currentTime + t0);
+        g.gain.linearRampToValueAtTime(0.02, c.currentTime + t0 + 0.015);
+        g.gain.exponentialRampToValueAtTime(0.0005, c.currentTime + t0 + 0.11);
+        o.connect(g); g.connect(c.destination);
+        o.start(c.currentTime + t0);
+        o.stop(c.currentTime + t0 + 0.13);
+      })(n);
+    }
+  }
+  var birdTimer = null;
+  function scheduleBird(){
+    clearTimeout(birdTimer);
+    var delay = 4000 + Math.random() * 9000;
+    birdTimer = setTimeout(function(){
+      if(ambient.active) chirp();
+      scheduleBird();
+    }, delay);
+  }
+
+  function updateAmbient(){
+    if(!ambient.started || !audioCtx) return;
+    var modalOpen = !!document.querySelector('.modal-veil.open');
+    var walkmanOn = !document.getElementById('walkmanAudio').paused;
+    ambient.active = !(modalOpen || walkmanOn);
+    var target = ambient.active ? 0.035 : 0;
+    var trafficTarget = ambient.active ? 0.018 : 0;
+    ambient.gain.gain.cancelScheduledValues(audioCtx.currentTime);
+    ambient.gain.gain.setTargetAtTime(target, audioCtx.currentTime, 0.5);
+    ambient.trafficGain.gain.cancelScheduledValues(audioCtx.currentTime);
+    ambient.trafficGain.gain.setTargetAtTime(trafficTarget, audioCtx.currentTime, 0.7);
+  }
+  document.addEventListener('pointerdown', function once(){
+    document.removeEventListener('pointerdown', once);
+    startAmbient();
+  });
+
+  function flash(btn){
+    btn.classList.add('pulse');
+    setTimeout(function(){btn.classList.remove('pulse')}, 1100);
+  }
+
+  /* ============ MODALES ============ */
+  function openModal(modal, trigger){
+    lastTrigger = trigger;
+    modal.classList.add('open');
+    var close = modal.querySelector('.modal-close');
+    if(close) close.focus();
+    updateAmbient();
+  }
+  function closeModal(veil){
+    veil.classList.remove('open');
+    if(lastTrigger){ lastTrigger.focus(); lastTrigger = null; }
+    updateAmbient();
+  }
+  function wire(btnId, modalId){
+    var btn = document.getElementById(btnId);
+    var modal = document.getElementById(modalId);
+    btn.addEventListener('click', function(){
+      flash(btn);
+      soundClick();
+      openModal(modal, btn);
+    });
+  }
+  wire('btnPortfolio','modalPortfolio');
+  wire('btnAbout','modalAbout');
+  wire('btnServices','modalServices');
+  wire('btnContact','modalContact');
+
+  document.getElementById('btnLegal').addEventListener('click', function(){
+    openModal(document.getElementById('modalLegal'), this);
+  });
+
+  document.querySelectorAll('[data-close]').forEach(function(b){
+    b.addEventListener('click', function(){ closeModal(b.closest('.modal-veil')); });
+  });
+  document.querySelectorAll('.modal-veil').forEach(function(v){
+    v.addEventListener('click', function(e){ if(e.target === v) closeModal(v); });
+  });
+  document.addEventListener('keydown', function(e){
+    if(e.key === 'Escape'){
+      var open = document.querySelector('.modal-veil.open');
+      if(open) closeModal(open);
+    }
+  });
+
+  document.getElementById('btnLogo').addEventListener('click', function(){
+    flash(this);
+    soundLogo();
+  });
+
+  var denyFlag = document.getElementById('denyFlag');
+  var denyTimer = null;
+  document.getElementById('btnIdeas').addEventListener('click', function(){
+    var b = this;
+    b.classList.add('deny');
+    setTimeout(function(){b.classList.remove('deny')}, 550);
+    soundDeny();
+    denyFlag.classList.add('show');
+    clearTimeout(denyTimer);
+    denyTimer = setTimeout(function(){denyFlag.classList.remove('show')}, 1800);
+  });
+
+  var walkman = document.getElementById('walkmanAudio');
+  var note = document.getElementById('musicNote');
+  document.getElementById('btnWalkman').addEventListener('click', function(){
+    flash(this);
+    if(walkman.paused){
+      walkman.volume = 0.8;
+      walkman.play().then(function(){ note.classList.add('show'); updateAmbient(); }).catch(function(){});
+    } else {
+      walkman.pause();
+      walkman.currentTime = 0;
+      note.classList.remove('show');
+      updateAmbient();
+    }
+  });
+
+  document.getElementById('sendContact').addEventListener('click', function(){
+    var name = document.getElementById('cName').value.trim();
+    var email = document.getElementById('cEmail').value.trim();
+    var phone = document.getElementById('cPhone').value.trim();
+    var msg = document.getElementById('cMsg').value.trim();
+    var body = 'Nom : ' + name + '\nEmail : ' + email + (phone ? '\nTéléphone : ' + phone : '') + '\n\n' + msg;
+    var url = 'mailto:stephane.martin777@gmail.com'
+      + '?subject=' + encodeURIComponent('Projet via S.MART1 Builder')
+      + '&body=' + encodeURIComponent(body);
+    window.location.href = url;
+  });
+
+  if(!reduced){
+    setTimeout(function(){
+      document.querySelectorAll('.hotspot').forEach(flash);
+    }, 900);
+  }
+
+  /* ============ SCÈNE VIVANTE — WebGL ============ */
+  var stage = document.getElementById('stage');
+  var glCanvas = document.getElementById('gl');
+  var fallback = document.getElementById('fallbackScene');
+
+  if(!reduced && window.THREE){
+    try{ initGL(); }catch(e){ glCanvas.style.display='none'; }
+  }
+
+  function initGL(){
+    var renderer = new THREE.WebGLRenderer({
+      canvas:glCanvas, antialias:false,
+      preserveDrawingBuffer: location.search.indexOf('probe') > -1
+    });
+    renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    var scene3 = new THREE.Scene();
+    var camera = new THREE.OrthographicCamera(-1,1,1,-1,0,1);
+    var uniforms = {
+      uTex:{value:null},
+      uMask:{value:null},
+      uTime:{value:0},
+      uMouse:{value:new THREE.Vector2(0,0)}
+    };
+    var material = new THREE.ShaderMaterial({
+      uniforms:uniforms,
+      vertexShader:[
+        'varying vec2 vUv;',
+        'void main(){ vUv = uv; gl_Position = vec4(position.xy, 0.0, 1.0); }'
+      ].join('\n'),
+      fragmentShader:[
+        'precision mediump float;',
+        'uniform sampler2D uTex;',
+        'uniform sampler2D uMask;',
+        'uniform float uTime;',
+        'uniform vec2 uMouse;',
+        'varying vec2 vUv;',
+        'float hash(vec2 p){ return fract(sin(dot(p, vec2(127.1, 311.7))) * 43758.5453); }',
+        'float vnoise(vec2 p){',
+        '  vec2 i = floor(p); vec2 f = fract(p);',
+        '  vec2 u = f*f*(3.0-2.0*f);',
+        '  return mix(mix(hash(i), hash(i+vec2(1.0,0.0)), u.x),',
+        '             mix(hash(i+vec2(0.0,1.0)), hash(i+vec2(1.0,1.0)), u.x), u.y);',
+        '}',
+        'void main(){',
+        /* parallaxe uniforme, uniquement pilotee par la souris : rien ne se deforme */
+        '  vec2 uv = (vUv - 0.5) * 0.985 + 0.5 - uMouse * 0.006;',
+        '  float m = texture2D(uMask, uv).r;',
+        '  float top = 1.0 - uv.y;',
+        '  vec2 suv = uv;',
+        /* micro-remous strictement dans l eau, tres attenue */
+        '  suv.y += m * 0.0005 * sin(top*70.0 + uTime*1.4 + uv.x*50.0);',
+        '  vec3 col = texture2D(uTex, suv).rgb;',
+        /* flux lumineux lent qui descend le long des chutes */
+        '  float f1 = vnoise(vec2(uv.x*110.0, top*55.0 - uTime*0.5));',
+        '  float f2 = vnoise(vec2(uv.x*190.0 + 7.3, top*95.0 - uTime*0.85));',
+        '  float glint = f1*0.55 + f2*0.45 - 0.5;',
+        '  col += m * glint * 0.11 * vec3(0.88, 0.97, 1.06);',
+        '  gl_FragColor = vec4(col, 1.0);',
+        '}'
+      ].join('\n')
+    });
+    scene3.add(new THREE.Mesh(new THREE.PlaneGeometry(2,2), material));
+
+    var loader = new THREE.TextureLoader();
+    var loaded = 0;
+    function onePart(){
+      loaded++;
+      if(loaded === 2){
+        glCanvas.classList.add('ready');
+        setTimeout(function(){ fallback.style.visibility='hidden'; }, 900);
+        requestAnimationFrame(loop);
+      }
+    }
+    loader.load('assets/scene-v2.jpg', function(tex){
+      tex.minFilter = THREE.LinearFilter;
+      tex.magFilter = THREE.LinearFilter;
+      uniforms.uTex.value = tex;
+      onePart();
+    });
+    loader.load('assets/water-mask.png', function(tex){
+      tex.minFilter = THREE.LinearFilter;
+      tex.magFilter = THREE.LinearFilter;
+      uniforms.uMask.value = tex;
+      onePart();
+    });
+
+    var mouseTarget = {x:0, y:0};
+    var mouse = {x:0, y:0};
+    var lastMove = 0;
+    stage.addEventListener('pointermove', function(e){
+      var r = stage.getBoundingClientRect();
+      mouseTarget.x = ((e.clientX - r.left) / r.width) * 2 - 1;
+      mouseTarget.y = ((e.clientY - r.top) / r.height) * 2 - 1;
+      lastMove = performance.now();
+    });
+
+    function resize(){
+      var r = stage.getBoundingClientRect();
+      renderer.setSize(r.width, r.height, false);
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    function loop(t){
+      requestAnimationFrame(loop);
+      uniforms.uTime.value = t / 1000;
+      mouse.x += (mouseTarget.x - mouse.x) * 0.04;
+      mouse.y += (mouseTarget.y - mouse.y) * 0.04;
+      uniforms.uMouse.value.set(mouse.x, mouse.y);
+      renderer.render(scene3, camera);
+    }
+
+    if(location.search.indexOf('probe') > -1){
+      window.__renderAt = function(t){
+        uniforms.uTime.value = t;
+        renderer.render(scene3, camera);
+      };
+    }
+  }
+
+  /* ============ OISEAUX ============ */
+  if(!reduced){
+    var bCanvas = document.getElementById('birds');
+    var bctx = bCanvas.getContext('2d');
+    var birds = [];
+    var nextFlock = performance.now() + 2500;
+
+    function resizeBirds(){
+      var r = stage.getBoundingClientRect();
+      var dpr = Math.min(window.devicePixelRatio || 1, 2);
+      bCanvas.width = r.width * dpr;
+      bCanvas.height = r.height * dpr;
+      bctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+    window.addEventListener('resize', resizeBirds);
+    resizeBirds();
+
+    function spawnFlock(){
+      var r = stage.getBoundingClientRect();
+      var n = 1 + Math.floor(Math.random() * 3);
+      var dir = Math.random() < 0.5 ? 1 : -1;
+      var baseY = (0.07 + Math.random() * 0.16) * r.height;
+      for(var i = 0; i < n; i++){
+        birds.push({
+          x: (dir === 1 ? 0.17 : 0.48) * r.width + (Math.random() - 0.5) * 20,
+          y: baseY + i * (6 + Math.random() * 8),
+          vx: dir * (0.018 + Math.random() * 0.008) * r.width / 60,
+          size: 3.2 + Math.random() * 2.4,
+          phase: Math.random() * Math.PI * 2
+        });
+      }
+    }
+
+    function drawBirds(t){
+      requestAnimationFrame(drawBirds);
+      var r = stage.getBoundingClientRect();
+      bctx.clearRect(0, 0, r.width, r.height);
+      if(t > nextFlock){
+        spawnFlock();
+        nextFlock = t + 9000 + Math.random() * 11000;
+      }
+      var x0 = 0.185 * r.width, x1 = 0.465 * r.width;
+      for(var i = birds.length - 1; i >= 0; i--){
+        var b = birds[i];
+        b.x += b.vx;
+        b.y += Math.sin(t / 900 + b.phase) * 0.15;
+        if(b.x < x0 - 30 || b.x > x1 + 30){ birds.splice(i, 1); continue; }
+        var edge = Math.min((b.x - x0) / 24, (x1 - b.x) / 24, 1);
+        if(edge <= 0) continue;
+        var flap = Math.sin(t / 90 + b.phase) * 0.9;
+        bctx.strokeStyle = 'rgba(30,38,48,' + (0.65 * edge).toFixed(2) + ')';
+        bctx.lineWidth = 1.1;
+        bctx.beginPath();
+        bctx.moveTo(b.x - b.size, b.y - flap * b.size * 0.55);
+        bctx.quadraticCurveTo(b.x - b.size * 0.3, b.y + b.size * 0.22, b.x, b.y);
+        bctx.quadraticCurveTo(b.x + b.size * 0.3, b.y + b.size * 0.22, b.x + b.size, b.y - flap * b.size * 0.55);
+        bctx.stroke();
+      }
+    }
+    requestAnimationFrame(drawBirds);
+  }
+})();
+</script>
+</body>
+</html>
