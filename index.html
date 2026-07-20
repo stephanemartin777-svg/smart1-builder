@@ -108,6 +108,24 @@ html,body{margin:0;background:var(--ink);color:var(--cream);font-family:var(--sa
 @keyframes blink{50%{opacity:.25}}
 @media (prefers-reduced-motion: reduce){.hint .blink{animation:none}}
 
+/* Petits ecrans : les zones cliquables de la photo deviennent trop
+   fines pour un doigt. On ajoute un menu de secours, lisible et
+   tres facile a toucher, sous la scene. */
+.mobile-nav{
+  display:none;
+  max-width:520px;margin:18px auto 0;padding:0 16px;
+  grid-template-columns:repeat(2,1fr);gap:10px;
+}
+.mobile-nav button{
+  font-family:var(--mono);font-size:.82rem;font-weight:700;letter-spacing:.03em;
+  color:var(--cream);background:#1c150e;border:1px solid var(--line);border-radius:8px;
+  padding:14px 10px;min-height:48px;cursor:pointer;
+}
+.mobile-nav button:active{background:#241b12;border-color:var(--amber-dim)}
+@media (max-width:640px){
+  .mobile-nav{display:grid}
+}
+
 footer{
   text-align:center;padding:26px 0 50px;color:var(--text-dim);
   font-family:var(--mono);font-size:.78rem;line-height:1.9;
@@ -228,6 +246,15 @@ footer .credit{font-size:.62rem;opacity:.6}
 </div>
 
 <p class="hint"><span class="blink">▮</span> CLIQUEZ SUR LES ÉCRANS ET LE WALKMAN POUR EXPLORER</p>
+
+<nav class="mobile-nav" aria-label="Navigation rapide">
+  <button id="navAbout">À propos</button>
+  <button id="navPortfolio">Portfolio</button>
+  <button id="navServices">Services</button>
+  <button id="navContact">Contact</button>
+  <button id="navWalkman">🎧 Musique</button>
+  <button id="navIdeas">Idées en cours</button>
+</nav>
 
 <footer>
   S.MART1 BUILDER · STÉPHANE MARTIN · 2026<br>
@@ -669,6 +696,18 @@ footer .credit{font-size:.62rem;opacity:.6}
   wire('btnAbout','modalAbout');
   wire('btnServices','modalServices');
   wire('btnContact','modalContact');
+
+  /* Menu de secours mobile : reutilise exactement les memes actions */
+  function relay(navId, btnId){
+    var nav = document.getElementById(navId);
+    if(nav) nav.addEventListener('click', function(){ document.getElementById(btnId).click(); });
+  }
+  relay('navAbout','btnAbout');
+  relay('navPortfolio','btnPortfolio');
+  relay('navServices','btnServices');
+  relay('navContact','btnContact');
+  relay('navIdeas','btnIdeas');
+  relay('navWalkman','btnWalkman');
 
   document.getElementById('btnLegal').addEventListener('click', function(){
     openModal(document.getElementById('modalLegal'), this);
