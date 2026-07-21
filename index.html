@@ -209,6 +209,7 @@ footer .credit{font-size:.62rem;opacity:.6}
 }
 .contact-btn:hover{filter:brightness(1.1)}
 .form-note{font-size:.8rem;color:#5C5F69;margin-top:12px}
+.form-note.sent{font-size:1.05rem;font-weight:600;text-align:center;margin-top:6px}
 
 .svc{display:flex;gap:14px;align-items:flex-start;background:#fff;border:1px solid #E5E1D6;border-radius:14px;padding:18px 20px;margin-bottom:12px}
 .svc .ico{
@@ -520,8 +521,8 @@ footer .credit{font-size:.62rem;opacity:.6}
       </div>
       <input type="text" name="_honey" style="position:absolute;left:-9999px" tabindex="-1" autocomplete="off">
       <button type="submit" class="contact-btn" id="sendContact">Envoyer le message</button>
-      <p class="form-note" id="formStatus">Envoi direct, sans passer par votre messagerie.</p>
     </form>
+    <p class="form-note" id="formStatus">Envoi direct, sans passer par votre messagerie.</p>
   </div>
 </div>
 
@@ -770,16 +771,22 @@ footer .credit{font-size:.62rem;opacity:.6}
     e.preventDefault();
     if(document.querySelector('input[name="_honey"]').value){ return; }
 
+    var nom = document.getElementById('cName').value.trim();
+    var mail = document.getElementById('cEmail').value.trim();
+    var phone = document.getElementById('cPhone').value.trim();
+    var msg = document.getElementById('cMsg').value.trim();
+
+    var intro = 'Formulaire envoyé. Quelqu\'un vient de vous soumettre le formulaire de contact de votre site S.MART1 Builder.';
+
     var payload = {
-      Nom: document.getElementById('cName').value.trim(),
-      Email: document.getElementById('cEmail').value.trim(),
-      Message: document.getElementById('cMsg').value.trim(),
+      Nom: nom,
+      Email: mail,
+      Téléphone: phone || 'Non renseigné',
+      Message: intro + '\n\n' + msg,
       _subject: 'Nouvelle demande · S.MART1 Builder',
-      _template: 'table',
+      _template: 'basic',
       _captcha: 'false'
     };
-    var phone = document.getElementById('cPhone').value.trim();
-    if(phone) payload['Téléphone'] = phone;
 
     sendBtn.disabled = true;
     sendBtn.textContent = 'Envoi...';
