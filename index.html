@@ -501,24 +501,27 @@ footer .credit{font-size:.62rem;opacity:.6}
     <h2>Discutons de votre projet</h2>
     <p class="dim" style="margin-bottom:20px">Laissez vos coordonnées et quelques mots, je vous recontacte rapidement.</p>
 
-    <div class="field-row">
-      <label for="cName">Votre nom</label>
-      <input id="cName" type="text" autocomplete="name" placeholder="Jean Dupont">
-    </div>
-    <div class="field-row">
-      <label for="cEmail">Votre email</label>
-      <input id="cEmail" type="email" autocomplete="email" placeholder="jean@exemple.fr">
-    </div>
-    <div class="field-row">
-      <label for="cPhone">Votre téléphone (optionnel)</label>
-      <input id="cPhone" type="tel" autocomplete="tel" placeholder="06 12 34 56 78">
-    </div>
-    <div class="field-row">
-      <label for="cMsg">Votre projet en quelques mots</label>
-      <textarea id="cMsg" placeholder="Je voudrais automatiser..."></textarea>
-    </div>
-    <button class="contact-btn" id="sendContact">Envoyer le message</button>
-    <p class="form-note">Le bouton ouvre votre messagerie avec le message prérempli. Rien n'est envoyé sans votre validation.</p>
+    <form id="contactForm">
+      <div class="field-row">
+        <label for="cName">Votre nom</label>
+        <input id="cName" name="Nom" type="text" autocomplete="name" placeholder="Jean Dupont" required>
+      </div>
+      <div class="field-row">
+        <label for="cEmail">Votre email</label>
+        <input id="cEmail" name="Email" type="email" autocomplete="email" placeholder="jean@exemple.fr" required>
+      </div>
+      <div class="field-row">
+        <label for="cPhone">Votre téléphone (optionnel)</label>
+        <input id="cPhone" name="Téléphone" type="tel" autocomplete="tel" placeholder="06 12 34 56 78">
+      </div>
+      <div class="field-row">
+        <label for="cMsg">Votre projet en quelques mots</label>
+        <textarea id="cMsg" name="Message" placeholder="Je voudrais automatiser..." required></textarea>
+      </div>
+      <input type="text" name="_honey" style="position:absolute;left:-9999px" tabindex="-1" autocomplete="off">
+      <button type="submit" class="contact-btn" id="sendContact">Envoyer le message</button>
+      <p class="form-note" id="formStatus">Envoi direct, sans passer par votre messagerie.</p>
+    </form>
   </div>
 </div>
 
@@ -758,37 +761,50 @@ footer .credit{font-size:.62rem;opacity:.6}
     }
   });
 
-  document.getElementById('sendContact').addEventListener('click', function(){
-    var name = document.getElementById('cName').value.trim();
-    var email = document.getElementById('cEmail').value.trim();
+  var contactForm = document.getElementById('contactForm');
+  var formStatus = document.getElementById('formStatus');
+  var sendBtn = document.getElementById('sendContact');
+  var FORM_ENDPOINT = 'https://formsubmit.co/ajax/stephane.martin777@gmail.com';
+
+  contactForm.addEventListener('submit', function(e){
+    e.preventDefault();
+    if(document.querySelector('input[name="_honey"]').value){ return; }
+
+    var payload = {
+      Nom: document.getElementById('cName').value.trim(),
+      Email: document.getElementById('cEmail').value.trim(),
+      Message: document.getElementById('cMsg').value.trim(),
+      _subject: 'Nouvelle demande · S.MART1 Builder',
+      _template: 'table',
+      _captcha: 'false'
+    };
     var phone = document.getElementById('cPhone').value.trim();
-    var msg = document.getElementById('cMsg').value.trim();
-    var lignes = [
-      'NOUVELLE DEMANDE · S.MART1 BUILDER',
-      '========================================',
-      '',
-      'Nom : ' + name,
-      'Email : ' + email
-    ];
-    if(phone) lignes.push('Téléphone : ' + phone);
-    lignes.push('');
-    lignes.push('Message :');
-    lignes.push(msg);
-    lignes.push('');
-    lignes.push('========================================');
-    lignes.push('Formulaire de contact · smart1-builder.github.io');
-    var body = lignes.join('\n');
-    var gmailUrl = 'https://mail.google.com/mail/?view=cm&fs=1'
-      + '&to=' + encodeURIComponent('stephane.martin777@gmail.com')
-      + '&su=' + encodeURIComponent('Projet via S.MART1 Builder')
-      + '&body=' + encodeURIComponent(body);
-    var win = window.open(gmailUrl, '_blank', 'noopener');
-    if(!win){
-      var mailtoUrl = 'mailto:stephane.martin777@gmail.com'
-        + '?subject=' + encodeURIComponent('Projet via S.MART1 Builder')
-        + '&body=' + encodeURIComponent(body);
-      window.location.href = mailtoUrl;
-    }
+    if(phone) payload['Téléphone'] = phone;
+
+    sendBtn.disabled = true;
+    sendBtn.textContent = 'Envoi...';
+    formStatus.style.color = '';
+    formStatus.textContent = 'Envoi en cours...';
+
+    fetch(FORM_ENDPOINT, {
+      method: 'POST',
+      headers: {'Content-Type':'application/json', 'Accept':'application/json'},
+      body: JSON.stringify(payload)
+    })
+    .then(function(r){ if(!r.ok) throw new Error('bad status'); return r.json(); })
+    .then(function(){
+      formStatus.textContent = 'Message envoyé. Je vous réponds rapidement.';
+      formStatus.style.color = '#1F6B4C';
+      contactForm.reset();
+      sendBtn.textContent = 'Envoyer le message';
+      sendBtn.disabled = false;
+    })
+    .catch(function(){
+      formStatus.textContent = "L'envoi a échoué. Écrivez directement à stephane.martin777@gmail.com.";
+      formStatus.style.color = '#a33';
+      sendBtn.textContent = 'Envoyer le message';
+      sendBtn.disabled = false;
+    });
   });
 
   if(!reduced){
