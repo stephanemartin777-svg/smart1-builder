@@ -498,8 +498,8 @@ footer .credit{font-size:.62rem;opacity:.6}
   <div class="modal" style="max-width:520px" role="dialog" aria-modal="true" aria-label="Contact">
     <button class="modal-close" data-close>✕</button>
     <div class="eyebrow">Contact</div>
-    <h2>Discutons de votre projet</h2>
-    <p class="dim" style="margin-bottom:20px">Laissez vos coordonnées et quelques mots, je vous recontacte rapidement.</p>
+    <h2 id="contactIntroTitle">Discutons de votre projet</h2>
+    <p class="dim" id="contactIntroText" style="margin-bottom:20px">Laissez vos coordonnées et quelques mots, je vous recontacte rapidement.</p>
 
     <form id="contactForm">
       <div class="field-row">
@@ -700,9 +700,14 @@ footer .credit{font-size:.62rem;opacity:.6}
   wire('btnServices','modalServices');
   wire('btnContact','modalContact');
 
+  var contactIntroTitle = document.getElementById('contactIntroTitle');
+  var contactIntroText = document.getElementById('contactIntroText');
+
   document.getElementById('btnContact').addEventListener('click', function(){
     contactForm.reset();
     contactForm.style.display = '';
+    contactIntroTitle.style.display = '';
+    contactIntroText.style.display = '';
     formStatus.style.color = '';
     formStatus.textContent = 'Envoi direct, sans passer par votre messagerie.';
   });
@@ -808,7 +813,9 @@ footer .credit{font-size:.62rem;opacity:.6}
     .then(function(){
       contactForm.reset();
       contactForm.style.display = 'none';
-      formStatus.textContent = 'Votre message a bien été envoyé.';
+      contactIntroTitle.style.display = 'none';
+      contactIntroText.style.display = 'none';
+      formStatus.textContent = 'Je vous remercie. Votre message a bien été envoyé. Nous vous répondrons dès que possible.';
       formStatus.style.color = '#1F6B4C';
       sendBtn.textContent = 'Envoyer le message';
       sendBtn.disabled = false;
