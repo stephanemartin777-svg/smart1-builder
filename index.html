@@ -764,10 +764,17 @@ footer .credit{font-size:.62rem;opacity:.6}
     var phone = document.getElementById('cPhone').value.trim();
     var msg = document.getElementById('cMsg').value.trim();
     var body = 'Nom : ' + name + '\nEmail : ' + email + (phone ? '\nTéléphone : ' + phone : '') + '\n\n' + msg;
-    var url = 'mailto:stephane.martin777@gmail.com'
-      + '?subject=' + encodeURIComponent('Projet via S.MART1 Builder')
+    var gmailUrl = 'https://mail.google.com/mail/?view=cm&fs=1'
+      + '&to=' + encodeURIComponent('stephane.martin777@gmail.com')
+      + '&su=' + encodeURIComponent('Projet via S.MART1 Builder')
       + '&body=' + encodeURIComponent(body);
-    window.location.href = url;
+    var win = window.open(gmailUrl, '_blank', 'noopener');
+    if(!win){
+      var mailtoUrl = 'mailto:stephane.martin777@gmail.com'
+        + '?subject=' + encodeURIComponent('Projet via S.MART1 Builder')
+        + '&body=' + encodeURIComponent(body);
+      window.location.href = mailtoUrl;
+    }
   });
 
   if(!reduced){
