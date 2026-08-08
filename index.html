@@ -44,6 +44,23 @@ html,body{margin:0;background:var(--ink);color:var(--cream);font-family:var(--sa
   .jax{transform:none !important}
 }
 
+.stage-flash{
+  position:absolute;inset:0;pointer-events:none;z-index:20;opacity:0;
+  background:
+    repeating-linear-gradient(to bottom, rgba(224,162,74,.4) 0px, rgba(224,162,74,.4) 1px, transparent 2px, transparent 4px),
+    rgba(224,162,74,.16);
+  mix-blend-mode:screen;
+}
+.stage-flash.play{animation:stageFlash .4s ease-out}
+@keyframes stageFlash{
+  0%{opacity:0}
+  18%{opacity:1}
+  100%{opacity:0}
+}
+@media (prefers-reduced-motion: reduce){
+  .stage-flash.play{animation:none}
+}
+
 /* ============ HOTSPOTS ============ */
 .hotspot{
   position:absolute;border:none;background:transparent;cursor:pointer;padding:0;
@@ -141,6 +158,26 @@ footer{
   font-family:var(--mono);font-size:.78rem;line-height:1.9;
 }
 footer .credit{font-size:.62rem;opacity:.6}
+
+/* ============ SECTIONS SCROLL ============ */
+.sections{max-width:900px;margin:0 auto;padding:10px 20px 20px}
+.page-section{padding:64px 0}
+.page-section:first-child{padding-top:36px}
+.page-section .modal{margin:0 auto;box-shadow:none}
+.section-head{margin-bottom:22px}
+.section-eyebrow{
+  font-family:var(--mono);font-size:.72rem;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--amber);font-weight:700;margin-bottom:10px;
+}
+.section-title{
+  font-size:clamp(1.7rem,4.2vw,2.5rem);font-weight:800;letter-spacing:-.02em;
+  color:var(--cream);margin:0;line-height:1.1;
+}
+.reveal{opacity:0;transform:translateY(28px);transition:opacity .7s ease, transform .7s ease}
+.reveal.in-view{opacity:1;transform:translateY(0)}
+@media (prefers-reduced-motion: reduce){
+  .reveal{opacity:1;transform:none;transition:none}
+}
 
 /* ============ MODALES (dossier crème) ============ */
 .modal-veil{
@@ -241,6 +278,7 @@ footer .credit{font-size:.62rem;opacity:.6}
   <canvas id="gl"></canvas>
   <canvas id="birds"></canvas>
   <img class="jax" id="jax" src="assets/jax.png" alt="" aria-hidden="true">
+  <div class="stage-flash" id="stageFlash"></div>
 
   <button class="hotspot spot-logo" id="btnLogo" aria-label="S.MART1 Builder" title="S.MART1 Builder"></button>
   <button class="hotspot spot-about" id="btnAbout" aria-haspopup="dialog" aria-label="À propos" title="À propos"></button>
@@ -266,11 +304,6 @@ footer .credit{font-size:.62rem;opacity:.6}
   <button id="navWalkman">🎧 Musique</button>
   <button id="navIdeas">Idées en cours</button>
 </nav>
-
-<footer>
-  S.MART1 BUILDER · STÉPHANE MARTIN · 2026<br>
-  <span class="credit">Musique : "Dream" — Tyler Gill (Pixabay) · <button id="btnLegal" style="background:none;border:none;color:inherit;font:inherit;text-decoration:underline;cursor:pointer;padding:0">Mentions légales &amp; confidentialité</button></span>
-</footer>
 
 <!-- Modal: Mentions légales -->
 <div class="modal-veil" id="modalLegal">
@@ -304,13 +337,47 @@ footer .credit{font-size:.62rem;opacity:.6}
   </div>
 </div>
 
-<!-- Modal: Portfolio -->
-<div class="modal-veil" id="modalPortfolio">
-  <div class="modal" role="dialog" aria-modal="true" aria-label="Portfolio">
-    <button class="modal-close" data-close>✕</button>
-    <div class="eyebrow">Portfolio · Projets &amp; réalisations</div>
-    <h2 style="margin-bottom:22px">Automatiser un métier de l'intérieur</h2>
+<main class="sections">
 
+<section class="page-section reveal" id="sec-about" aria-label="À propos">
+  <div class="section-head">
+    <div class="section-eyebrow">01 — À propos</div>
+    <h2 class="section-title">Qui je suis</h2>
+  </div>
+  <div class="modal" style="max-width:640px">
+    <p>Stéphane Martin, Product Builder à Lyon. Je construis des produits digitaux de bout en bout : sites, webapps, automatisations, agents IA. Je pars d'un problème concret, je choisis l'outil le plus simple qui le résout vraiment, et je livre quelque chose qui tourne.</p>
+
+    <div class="work" style="margin-top:18px">
+      <span class="tag">Parcours</span>
+      <p>Entrepreneur avant tout : j'ai créé une agence de marketing digital, que j'ai développée pendant plusieurs années puis cédée. J'y ai conçu et livré de vrais sites complets sous Webflow : CMS, blog, intégrations, automatisations, référencement. Certains projets ont représenté plusieurs mois de développement, en production chez de vrais clients.</p>
+      <p style="margin-top:10px">Aujourd'hui, je conçois des outils de terrain, notamment pour le secteur de la santé : extensions navigateur, chaînes d'automatisation, assistants IA. Des outils utilisés tous les jours, qui font gagner des centaines d'heures par an.</p>
+    </div>
+
+    <div class="work">
+      <span class="tag">Formation</span>
+      <p>RNCP niveau 6, Mastère Cube : Airtable, Make, n8n, prompting avancé, IA appliquée, Claude Code, Bubble, Notion. La formation de référence du no-code en France.</p>
+    </div>
+
+    <div class="work">
+      <span class="tag">Ma méthode</span>
+      <p>L'IA n'est qu'un levier. La méthode, c'est :</p>
+      <ol style="margin:10px 0 0;padding-left:20px">
+        <li>Comprendre les vrais problèmes sur le terrain.</li>
+        <li>Construire vite.</li>
+        <li>Tester en réel.</li>
+        <li>Ne jamais rogner sur la sécurité des données.</li>
+      </ol>
+      <p style="margin-top:12px">L'idéal étant une immersion de quelques jours au sein des services pour comprendre le problème : c'est le meilleur moyen de le résoudre.</p>
+    </div>
+  </div>
+</section>
+
+<section class="page-section reveal" id="sec-portfolio" aria-label="Portfolio">
+  <div class="section-head">
+    <div class="section-eyebrow">02 — Portfolio · Projets &amp; réalisations</div>
+    <h2 class="section-title">Automatiser un métier de l'intérieur</h2>
+  </div>
+  <div class="modal">
     <article class="work">
       <span class="tag">Projet phare</span>
       <h3>Relance automatisée d'un parcours de suivi</h3>
@@ -401,47 +468,14 @@ footer .credit{font-size:.62rem;opacity:.6}
       </div>
     </div>
   </div>
-</div>
+</section>
 
-<!-- Modal: À propos -->
-<div class="modal-veil" id="modalAbout">
-  <div class="modal" style="max-width:640px" role="dialog" aria-modal="true" aria-label="À propos">
-    <button class="modal-close" data-close>✕</button>
-    <div class="eyebrow">À propos</div>
-    <h2>Qui je suis</h2>
-    <p>Stéphane Martin, Product Builder à Lyon. Je construis des produits digitaux de bout en bout : sites, webapps, automatisations, agents IA. Je pars d'un problème concret, je choisis l'outil le plus simple qui le résout vraiment, et je livre quelque chose qui tourne.</p>
-
-    <div class="work" style="margin-top:18px">
-      <span class="tag">Parcours</span>
-      <p>Entrepreneur avant tout : j'ai créé une agence de marketing digital, que j'ai développée pendant plusieurs années puis cédée. J'y ai conçu et livré de vrais sites complets sous Webflow : CMS, blog, intégrations, automatisations, référencement. Certains projets ont représenté plusieurs mois de développement, en production chez de vrais clients.</p>
-      <p style="margin-top:10px">Aujourd'hui, je conçois des outils de terrain, notamment pour le secteur de la santé : extensions navigateur, chaînes d'automatisation, assistants IA. Des outils utilisés tous les jours, qui font gagner des centaines d'heures par an.</p>
-    </div>
-
-    <div class="work">
-      <span class="tag">Formation</span>
-      <p>RNCP niveau 6, Mastère Cube : Airtable, Make, n8n, prompting avancé, IA appliquée, Claude Code, Bubble, Notion. La formation de référence du no-code en France.</p>
-    </div>
-
-    <div class="work">
-      <span class="tag">Ma méthode</span>
-      <p>L'IA n'est qu'un levier. La méthode, c'est :</p>
-      <ol style="margin:10px 0 0;padding-left:20px">
-        <li>Comprendre les vrais problèmes sur le terrain.</li>
-        <li>Construire vite.</li>
-        <li>Tester en réel.</li>
-        <li>Ne jamais rogner sur la sécurité des données.</li>
-      </ol>
-      <p style="margin-top:12px">L'idéal étant une immersion de quelques jours au sein des services pour comprendre le problème : c'est le meilleur moyen de le résoudre.</p>
-    </div>
+<section class="page-section reveal" id="sec-services" aria-label="Services">
+  <div class="section-head">
+    <div class="section-eyebrow">03 — Services</div>
+    <h2 class="section-title">Ce que je peux construire pour vous</h2>
   </div>
-</div>
-
-<!-- Modal: Services -->
-<div class="modal-veil" id="modalServices">
-  <div class="modal" style="max-width:620px" role="dialog" aria-modal="true" aria-label="Services">
-    <button class="modal-close" data-close>✕</button>
-    <div class="eyebrow">Services</div>
-    <h2 style="margin-bottom:20px">Ce que je peux construire pour vous</h2>
+  <div class="modal" style="max-width:620px">
 
     <div class="svc">
       <div class="ico">↻</div>
@@ -502,14 +536,14 @@ footer .credit{font-size:.62rem;opacity:.6}
       <span class="chip">API &amp; Webhooks</span>
     </div>
   </div>
-</div>
+</section>
 
-<!-- Modal: Contact -->
-<div class="modal-veil" id="modalContact">
-  <div class="modal" style="max-width:520px" role="dialog" aria-modal="true" aria-label="Contact">
-    <button class="modal-close" data-close>✕</button>
-    <div class="eyebrow">Contact</div>
-    <h2 id="contactIntroTitle">Discutons de votre projet</h2>
+<section class="page-section reveal" id="sec-contact" aria-label="Contact">
+  <div class="section-head">
+    <div class="section-eyebrow">04 — Contact</div>
+    <h2 class="section-title" id="contactIntroTitle">Discutons de votre projet</h2>
+  </div>
+  <div class="modal" style="max-width:520px">
     <p class="dim" id="contactIntroText" style="margin-bottom:20px">Laissez vos coordonnées et quelques mots, je vous recontacte rapidement.</p>
 
     <form id="contactForm">
@@ -534,7 +568,14 @@ footer .credit{font-size:.62rem;opacity:.6}
     </form>
     <p class="form-note" id="formStatus">Envoi direct, sans passer par votre messagerie.</p>
   </div>
-</div>
+</section>
+
+</main>
+
+<footer>
+  S.MART1 BUILDER · STÉPHANE MARTIN · 2026<br>
+  <span class="credit">Musique : "Dream" — Tyler Gill (Pixabay) · <button id="btnLegal" style="background:none;border:none;color:inherit;font:inherit;text-decoration:underline;cursor:pointer;padding:0">Mentions légales &amp; confidentialité</button></span>
+</footer>
 
 <script src="assets/three.min.js"></script>
 <script>
@@ -697,19 +738,44 @@ footer .credit{font-size:.62rem;opacity:.6}
     if(lastTrigger){ lastTrigger.focus(); lastTrigger = null; }
     updateAmbient();
   }
-  function wire(btnId, modalId){
-    var btn = document.getElementById(btnId);
-    var modal = document.getElementById(modalId);
-    btn.addEventListener('click', function(){
-      flash(btn);
-      soundClick();
-      openModal(modal, btn);
+  /* ============ ÉCRANS → SECTIONS SCROLL ============ */
+  var stageFlash = document.getElementById('stageFlash');
+  function activateScreen(sectionId, btn){
+    flash(btn);
+    soundClick();
+    if(!reduced){
+      stageFlash.classList.remove('play');
+      void stageFlash.offsetWidth;
+      stageFlash.classList.add('play');
+    }
+    var target = document.getElementById(sectionId);
+    setTimeout(function(){
+      target.scrollIntoView({behavior: reduced ? 'auto' : 'smooth', block: 'start'});
+    }, reduced ? 0 : 160);
+  }
+  function wireScroll(btnId, sectionId){
+    document.getElementById(btnId).addEventListener('click', function(){
+      activateScreen(sectionId, this);
     });
   }
-  wire('btnPortfolio','modalPortfolio');
-  wire('btnAbout','modalAbout');
-  wire('btnServices','modalServices');
-  wire('btnContact','modalContact');
+  wireScroll('btnAbout','sec-about');
+  wireScroll('btnPortfolio','sec-portfolio');
+  wireScroll('btnServices','sec-services');
+  wireScroll('btnContact','sec-contact');
+
+  if('IntersectionObserver' in window){
+    var revealObserver = new IntersectionObserver(function(entries){
+      entries.forEach(function(entry){
+        if(entry.isIntersecting){
+          entry.target.classList.add('in-view');
+          revealObserver.unobserve(entry.target);
+        }
+      });
+    }, {threshold:0.15});
+    document.querySelectorAll('.reveal').forEach(function(el){ revealObserver.observe(el); });
+  } else {
+    document.querySelectorAll('.reveal').forEach(function(el){ el.classList.add('in-view'); });
+  }
 
   var contactIntroTitle = document.getElementById('contactIntroTitle');
   var contactIntroText = document.getElementById('contactIntroText');
