@@ -34,6 +34,16 @@ html,body{margin:0;background:var(--ink);color:var(--cream);font-family:var(--sa
 #gl{opacity:0;transition:opacity .8s ease}
 #gl.ready{opacity:1}
 
+.jax{
+  position:absolute;left:17.94%;top:65.36%;width:24.22%;height:27.63%;
+  object-fit:contain;object-position:bottom center;pointer-events:none;
+  transform-origin:50% 88%;
+  will-change:transform;
+}
+@media (prefers-reduced-motion: reduce){
+  .jax{transform:none !important}
+}
+
 /* ============ HOTSPOTS ============ */
 .hotspot{
   position:absolute;border:none;background:transparent;cursor:pointer;padding:0;
@@ -230,6 +240,7 @@ footer .credit{font-size:.62rem;opacity:.6}
   <img class="scene" id="fallbackScene" src="assets/scene-v2.jpg" alt="Poste de pilotage S.MART1 Builder : six écrans présentant le studio, avec Jax le whippet dans son panier et une baie vitrée sur une cité végétale">
   <canvas id="gl"></canvas>
   <canvas id="birds"></canvas>
+  <img class="jax" id="jax" src="assets/jax.png" alt="" aria-hidden="true">
 
   <button class="hotspot spot-logo" id="btnLogo" aria-label="S.MART1 Builder" title="S.MART1 Builder"></button>
   <button class="hotspot spot-about" id="btnAbout" aria-haspopup="dialog" aria-label="À propos" title="À propos"></button>
@@ -1014,6 +1025,25 @@ footer .credit{font-size:.62rem;opacity:.6}
       }
     }
     requestAnimationFrame(drawBirds);
+  }
+
+  /* ============ JAX — ANIMATION IDLE ============ */
+  if(!reduced){
+    var jax = document.getElementById('jax');
+    var jaxStage = document.getElementById('stage');
+    var jaxMouseTarget = 0, jaxMouse = 0;
+    jaxStage.addEventListener('pointermove', function(e){
+      var r = jaxStage.getBoundingClientRect();
+      jaxMouseTarget = ((e.clientX - r.left) / r.width) * 2 - 1;
+    });
+    function jaxLoop(t){
+      requestAnimationFrame(jaxLoop);
+      jaxMouse += (jaxMouseTarget - jaxMouse) * 0.04;
+      var breathe = 1 + Math.sin(t / 1800) * 0.012;
+      var lean = jaxMouse * 2.2;
+      jax.style.transform = 'scale(' + breathe.toFixed(4) + ') rotate(' + lean.toFixed(2) + 'deg)';
+    }
+    requestAnimationFrame(jaxLoop);
   }
 })();
 </script>
