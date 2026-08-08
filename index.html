@@ -25,6 +25,9 @@ html,body{margin:0;background:var(--ink);color:var(--cream);font-family:var(--sa
   aspect-ratio:1672/941;
   overflow:hidden;
 }
+@media (min-width:1300px){
+  .stage{ max-width:min(1800px, 90vw); }
+}
 .stage img.scene{
   position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;
 }
@@ -33,6 +36,15 @@ html,body{margin:0;background:var(--ink);color:var(--cream);font-family:var(--sa
 }
 #gl{opacity:0;transition:opacity .8s ease}
 #gl.ready{opacity:1}
+
+/* Petits ecrans : on bascule sur un cadrage serre (ecrans + fauteuil)
+   plutot que d'ecraser la scene large en bandeau ; les hotspots de la
+   photo ne correspondent plus a ce cadrage, on s'appuie sur le menu
+   de secours (.mobile-nav) pour l'interaction. */
+@media (max-width:640px){
+  .stage{ aspect-ratio:972/941; }
+  .hotspot,#birds{ display:none; }
+}
 
 /* ============ HOTSPOTS ============ */
 .hotspot{
@@ -227,7 +239,10 @@ footer .credit{font-size:.62rem;opacity:.6}
 <body>
 
 <div class="stage" id="stage">
-  <img class="scene" id="fallbackScene" src="assets/scene-v2.jpg" alt="Poste de pilotage S.MART1 Builder : six écrans présentant le studio, avec Jax le whippet dans son panier et une baie vitrée sur une cité végétale">
+  <picture>
+    <source media="(max-width:640px)" srcset="assets/scene-mobile.jpg">
+    <img class="scene" id="fallbackScene" src="assets/scene-v2.jpg" alt="Poste de pilotage S.MART1 Builder : six écrans présentant le studio, avec Jax le whippet dans son panier et une baie vitrée sur une cité végétale">
+  </picture>
   <canvas id="gl"></canvas>
   <canvas id="birds"></canvas>
 
@@ -839,7 +854,7 @@ footer .credit{font-size:.62rem;opacity:.6}
   var glCanvas = document.getElementById('gl');
   var fallback = document.getElementById('fallbackScene');
 
-  if(!reduced && window.THREE){
+  if(!reduced && window.THREE && window.innerWidth > 640){
     try{ initGL(); }catch(e){ glCanvas.style.display='none'; }
   }
 
@@ -955,7 +970,7 @@ footer .credit{font-size:.62rem;opacity:.6}
   }
 
   /* ============ OISEAUX ============ */
-  if(!reduced){
+  if(!reduced && window.innerWidth > 640){
     var bCanvas = document.getElementById('birds');
     var bctx = bCanvas.getContext('2d');
     var birds = [];
