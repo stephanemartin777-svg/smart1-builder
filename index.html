@@ -38,9 +38,8 @@ html,body{margin:0;background:var(--ink);color:var(--cream);font-family:var(--sa
 #gl.ready{opacity:1}
 
 /* Petits ecrans : cadrage serre sur les ecrans, le fauteuil et le
-   walkman plutot que la scene large ecrasee en bandeau. Les hotspots
-   sont repositionnes pour ce cadrage (voir plus bas) et restent
-   cliquables directement sur la photo. */
+   walkman (image dediee, ratio fixe pour que les hotspots restent
+   alignes sans rognage). La legende chevauche le bas de l'image. */
 @media (max-width:640px){
   .stage{ aspect-ratio:1152/760; }
   #birds{ display:none; }
@@ -52,6 +51,13 @@ html,body{margin:0;background:var(--ink);color:var(--cream);font-family:var(--sa
   .spot-ideas{ left:52.68%; top:39.00%; width:19.45%; height:28.48%; }
   .spot-contact{ left:74.46%; top:42.10%; width:23.22%; height:27.24%; }
   .spot-walkman{ left:69.52%; top:79.05%; width:16.69%; height:20%; }
+  .music-note{ left:76.78%; top:78.62%; }
+
+  .hint{
+    position:relative;z-index:10;margin-top:-96px;pointer-events:none;
+    padding:34px 16px 22px;
+    background:linear-gradient(to top, rgba(6,4,2,.85), transparent 80%);
+  }
 }
 
 /* ============ HOTSPOTS ============ */
