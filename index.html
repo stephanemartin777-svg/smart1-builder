@@ -251,6 +251,19 @@ footer .credit{font-size:.62rem;opacity:.6}
 .contact-btn:hover{filter:brightness(1.1)}
 .form-note{font-size:.8rem;color:#5C5F69;margin-top:12px}
 
+.work ul{margin:10px 0 0;padding-left:18px;color:#15171C;font-size:.95rem;line-height:1.7}
+.work ul li{margin-bottom:5px}
+.malt{
+  display:flex;align-items:center;justify-content:space-between;gap:14px;
+  background:#FFFFFF;border:1px solid #E5E1D6;border-radius:14px;padding:16px 18px;margin-bottom:22px;
+  text-decoration:none;color:#15171C;
+}
+.malt:hover{border-color:#1F6B4C}
+.malt .txt{display:flex;flex-direction:column;gap:3px}
+.malt .lbl{display:block;font-size:.95rem;font-weight:650}
+.malt .dim2{display:block;font-size:.82rem;color:#5C5F69}
+.malt .go{color:#1F6B4C;font-weight:700;font-size:.88rem;white-space:nowrap}
+
 .svc{display:flex;gap:14px;align-items:flex-start;background:#fff;border:1px solid #E5E1D6;border-radius:14px;padding:18px 20px;margin-bottom:12px}
 .svc .ico{
   min-width:40px;height:40px;border-radius:9px;background:#E7F0EA;color:#1F6B4C;
@@ -369,12 +382,48 @@ footer .credit{font-size:.62rem;opacity:.6}
   <div class="modal" role="dialog" aria-modal="true" aria-label="Portfolio">
     <button class="modal-close" data-close>✕</button>
     <div class="eyebrow">Portfolio · Projets &amp; réalisations</div>
-    <h2 style="margin-bottom:22px">Automatiser un métier de l'intérieur</h2>
+    <h2 style="margin-bottom:18px">Automatiser un métier de l'intérieur</h2>
+
+    <a class="malt" id="maltLink" href="https://www.malt.fr/profile/stephanemartin10" target="_blank" rel="noopener">
+      <span class="txt">
+        <span class="lbl">Profil Malt · Stéphane Martin</span>
+        <span class="dim2">Missions détaillées, avis clients et disponibilité</span>
+      </span>
+      <span class="go">Voir le profil ↗</span>
+    </a>
 
     <article class="work">
       <span class="tag">Projet phare</span>
+      <h3>Un calcul propriétaire rendu au terrain</h3>
+      <p class="sub">L'indicateur clé, en direct, au lieu de vingt jours plus tard.</p>
+      <div class="k">Le problème</div>
+      <p>Un indicateur de pilotage était calculé par un logiciel interne selon une formule que personne n'avait documentée. Chiffres arrêtés le 15, résultat diffusé le 5 du mois suivant : les équipes travaillaient avec vingt jours de retard, et quelqu'un y passait plusieurs jours par mois.</p>
+      <div class="k">Ce qui a été construit</div>
+      <p>J'ai retrouvé la formule en analysant les échanges de l'application, puis j'ai déployé une extension navigateur qui refait le calcul en direct, dans l'écran que les équipes ont déjà sous les yeux. Rien n'est modifié dans le système d'origine, aucune donnée n'en sort.</p>
+      <div class="metrics">
+        <div class="metric"><div class="big">minutes</div><div class="cap">de délai sur l'indicateur, contre 20 jours</div></div>
+        <div class="metric"><div class="big">~1 000 pages</div><div class="cap">couvertes en production, calcul vérifié une à une</div></div>
+      </div>
+    </article>
+
+    <article class="work">
+      <span class="tag">Extension navigateur · En service</span>
+      <h3>La synthèse d'un portefeuille de patients en un clic</h3>
+      <p class="sub">Ce qui prenait plusieurs jours tient maintenant dans une pause café.</p>
+      <div class="k">Le problème</div>
+      <p>Faire le point sur le suivi d'un praticien voulait dire reprendre chaque patient un par un : son statut, les raisons d'un décrochage, le dernier commentaire du technicien — puis tout rédiger. Plusieurs heures, parfois plusieurs jours, pour un seul praticien.</p>
+      <div class="k">Ce qui a été construit</div>
+      <p>Une extension qui se lance depuis l'extranet où le praticien consulte déjà ses patients. Elle sort le rapport complet, un email prêt à partir, et un tableau détaillé : qui suit, qui décroche, pourquoi, ce qui a été fait, et quand revoir chacun.</p>
+      <div class="metrics">
+        <div class="metric"><div class="big">3 livrables</div><div class="cap">rapport, email, tableau — en une seule action</div></div>
+        <div class="metric"><div class="big">0 donnée</div><div class="cap">ne quitte l'environnement sécurisé</div></div>
+      </div>
+    </article>
+
+    <article class="work">
+      <span class="tag">Déployé à l'échelle nationale</span>
       <h3>Relance automatisée d'un parcours de suivi</h3>
-      <p class="sub">Une méthode de relance déployée à l'échelle nationale.</p>
+      <p class="sub">Une méthode de relance qui se transmet d'une équipe à l'autre.</p>
       <div class="k">Le problème</div>
       <p>La relance suivait une méthode différente selon la personne en charge, entièrement à la main.</p>
       <div class="k">Ce qui a été construit</div>
@@ -386,73 +435,49 @@ footer .credit{font-size:.62rem;opacity:.6}
     </article>
 
     <article class="work">
-      <span class="tag">Extension navigateur · En service</span>
-      <h3>Synthèse de dossier en un clic</h3>
-      <p class="sub">Le bilan complet d'un dossier, généré instantanément.</p>
+      <span class="tag">Agent autonome · En service</span>
+      <h3>SnipeMyCar — la chasse aux bonnes affaires, en continu</h3>
+      <p class="sub">Un agent qui repère, contacte et négocie avant tout le monde.</p>
       <div class="k">Le problème</div>
-      <p>Faire le point sur un dossier se faisait pièce par pièce, à la main, plusieurs heures à chaque fois.</p>
+      <p>Un professionnel de l'automobile qui cherche un modèle précis au bon prix doit surveiller plusieurs sites d'annonces toute la journée. Les meilleures affaires partent dans l'heure.</p>
       <div class="k">Ce qui a été construit</div>
-      <p>Une extension navigateur qui produit la synthèse complète et l'export en un clic, sans qu'aucune donnée ne quitte l'environnement sécurisé.</p>
+      <p>Un agent qui surveille sans interruption les trois plus gros sites d'une région, trie ce qu'il trouve, envoie de lui-même une première offre sous le prix affiché, et alerte sur Telegram dès qu'un vendeur répond. Le reste s'empile proprement dans un tableau de suivi, avec un récapitulatif midi et soir.</p>
       <div class="metrics">
-        <div class="metric"><div class="big">1 clic</div><div class="cap">là où il fallait plusieurs heures</div></div>
-        <div class="metric"><div class="big">des dizaines d'heures</div><div class="cap">récupérées chaque mois à l'échelle d'une équipe</div></div>
+        <div class="metric"><div class="big">3 plateformes</div><div class="cap">surveillées en continu, sans intervention</div></div>
+        <div class="metric"><div class="big">immédiat</div><div class="cap">l'alerte part dès qu'un vendeur répond</div></div>
       </div>
     </article>
 
     <article class="work">
-      <span class="tag">Extension navigateur · En service</span>
-      <h3>Reporting mensuel automatisé</h3>
-      <p class="sub">Le rapport de suivi mensuel, produit et vérifié automatiquement.</p>
+      <span class="tag">Site client · Contenu autonome</span>
+      <h3>Un site Webflow qui écrit et publie tout seul</h3>
+      <p class="sub">Deux lignes éditoriales tenues sans une heure de rédaction.</p>
       <div class="k">Le problème</div>
-      <p>Un rapport mensuel construit à la main par copier-coller, avec un vrai risque d'erreur et un résultat difficile à reproduire à l'identique.</p>
+      <p>Le client avait un beau site, et plus le temps de l'alimenter : il fallait à la fois des articles de fond et une veille sur l'actualité de son secteur.</p>
       <div class="k">Ce qui a été construit</div>
-      <p>Une extension qui génère le rapport complet automatiquement, vérifiée ligne à ligne face à la version manuelle avant mise en service.</p>
+      <p>Deux chaînes en parallèle. L'une rédige et publie les articles de fond sur le blog et sur Medium. L'autre, un bot Telegram, ramasse chaque semaine ce qui se dit dans la presse française sur ses mots-clés et alimente une gazette. Personne n'y touche.</p>
       <div class="metrics">
-        <div class="metric"><div class="big">≈25 jours</div><div class="cap">de travail récupérés par an</div></div>
-        <div class="metric"><div class="big">100 %</div><div class="cap">de correspondance avec la version manuelle</div></div>
-      </div>
-    </article>
-
-    <article class="work">
-      <span class="tag">Livré</span>
-      <h3>Migration de données assistée</h3>
-      <p class="sub">Des milliers de dossiers à rebasculer entre deux plateformes.</p>
-      <div class="k">Le problème</div>
-      <p>Après une migration de plateforme, environ 6 000 dossiers avaient perdu leurs informations clés. À la main : trois semaines de saisie à temps plein.</p>
-      <div class="k">Ce qui a été construit</div>
-      <p>Un traitement automatisé et supervisé, par petits lots, avec vérification systématique avant chaque écriture.</p>
-      <div class="metrics">
-        <div class="metric"><div class="big">~6 000</div><div class="cap">dossiers traités</div></div>
-        <div class="metric"><div class="big">3 semaines</div><div class="cap">de saisie manuelle évitées</div></div>
+        <div class="metric"><div class="big">15 jours</div><div class="cap">entre deux articles de fond, publiés sur deux canaux</div></div>
+        <div class="metric"><div class="big">hebdo</div><div class="cap">une gazette alimentée seule, et un levier d'abonnés</div></div>
       </div>
     </article>
 
     <div class="eyebrow" style="margin-top:28px">Autres réalisations</div>
     <div class="others" style="margin-top:14px">
       <div class="mini">
-        <h4>Sites Webflow complets</h4>
-        <p>CMS, blog, intégrations et automatisations, livrés en agence pour de vrais clients. Plusieurs mois de développement sur certains projets.</p>
-        <div class="res">Conçus, livrés, exploités</div>
+        <h4>Assistant IA personnel, au prix d'un abonnement</h4>
+        <p>Agenda, mémoire, routines, veille quotidienne — sans facturation au token. Et pour ceux qui veulent tout garder chez eux, la même chose sur serveur privé avec un modèle open source.</p>
+        <div class="res">Environ 20 €/mois au lieu d'une note à l'usage</div>
+      </div>
+      <div class="mini">
+        <h4>Migration de données assistée</h4>
+        <p>Après un changement de plateforme, ~6 000 dossiers avaient perdu leurs informations clés. Reprise automatisée par petits lots, avec vérification avant chaque écriture.</p>
+        <div class="res">3 semaines de saisie manuelle évitées</div>
       </div>
       <div class="mini">
         <h4>Boutique e-commerce</h4>
         <p>Shopify et print-on-demand, construite de A à Z : catalogue, tunnel de paiement, automatisation du contenu.</p>
         <div class="res">De l'idée à la vente en ligne</div>
-      </div>
-      <div class="mini">
-        <h4>SnipeMyCar — agent de sourcing</h4>
-        <p>Un agent autonome qui surveille en continu les annonces de véhicules et alerte sur les bonnes affaires.</p>
-        <div class="res">Il chasse pendant que je dors</div>
-      </div>
-      <div class="mini">
-        <h4>Moneypenny — assistante IA</h4>
-        <p>Une assistante construite de A à Z sur Claude Code : agenda, mémoire, routines, veille quotidienne.</p>
-        <div class="res">IA appliquée, conçue sur mesure</div>
-      </div>
-      <div class="mini">
-        <h4>Chaîne de contenu automatisée</h4>
-        <p>Un blog qui collecte l'actualité par mots-clés, la réécrit proprement et la publie tout seul, site et Medium.</p>
-        <div class="res">Une chaîne qui tourne seule</div>
       </div>
       <div class="mini">
         <h4>Agence de marketing digital</h4>
@@ -570,7 +595,7 @@ footer .credit{font-size:.62rem;opacity:.6}
     <button class="modal-close" data-close>✕</button>
     <div class="eyebrow">Contact</div>
     <h2 id="contactIntroTitle">Discutons de votre projet</h2>
-    <p class="dim" id="contactIntroText" style="margin-bottom:20px">Laissez vos coordonnées et quelques mots, je vous recontacte rapidement.</p>
+    <p class="dim" id="contactIntroText" style="margin-bottom:20px">Laissez vos coordonnées et quelques mots, je vous recontacte rapidement. Vous pouvez aussi passer par <a href="https://www.malt.fr/profile/stephanemartin10" target="_blank" rel="noopener" style="color:#1F6B4C;font-weight:600">mon profil Malt</a>.</p>
 
     <form id="contactForm">
       <div class="field-row">
