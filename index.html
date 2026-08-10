@@ -25,6 +25,9 @@ html,body{margin:0;background:var(--ink);color:var(--cream);font-family:var(--sa
   aspect-ratio:1672/941;
   overflow:hidden;
 }
+@media (min-width:1300px){
+  .stage{ max-width:min(1800px, 90vw); }
+}
 .stage img.scene{
   position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;
 }
@@ -33,6 +36,29 @@ html,body{margin:0;background:var(--ink);color:var(--cream);font-family:var(--sa
 }
 #gl{opacity:0;transition:opacity .8s ease}
 #gl.ready{opacity:1}
+
+/* Petits ecrans : cadrage serre sur les ecrans, le fauteuil et le
+   walkman (image dediee, ratio fixe pour que les hotspots restent
+   alignes sans rognage). La legende chevauche le bas de l'image. */
+@media (max-width:640px){
+  .stage{ aspect-ratio:1152/760; }
+  #birds{ display:none; }
+
+  .spot-logo{ left:35.27%; top:10.52%; width:15.09%; height:26.00%; }
+  .spot-about{ left:52.68%; top:7.43%; width:19.45%; height:29.10%; }
+  .spot-portfolio{ left:74.46%; top:3.10%; width:23.22%; height:34.67%; }
+  .spot-services{ left:35.27%; top:39.00%; width:15.09%; height:26.00%; }
+  .spot-ideas{ left:52.68%; top:39.00%; width:19.45%; height:28.48%; }
+  .spot-contact{ left:74.46%; top:42.10%; width:23.22%; height:27.24%; }
+  .spot-walkman{ left:69.52%; top:79.05%; width:16.69%; height:20%; }
+  .music-note{ left:76.78%; top:78.62%; }
+
+  .hint{
+    position:relative;z-index:10;margin-top:-96px;pointer-events:none;
+    padding:34px 16px 22px;
+    background:linear-gradient(to top, rgba(6,4,2,.85), transparent 80%);
+  }
+}
 
 /* ============ HOTSPOTS ============ */
 .hotspot{
@@ -107,24 +133,6 @@ html,body{margin:0;background:var(--ink);color:var(--cream);font-family:var(--sa
 .hint .blink{color:var(--amber);animation:blink 2.2s steps(2) infinite}
 @keyframes blink{50%{opacity:.25}}
 @media (prefers-reduced-motion: reduce){.hint .blink{animation:none}}
-
-/* Petits ecrans : les zones cliquables de la photo deviennent trop
-   fines pour un doigt. On ajoute un menu de secours, lisible et
-   tres facile a toucher, sous la scene. */
-.mobile-nav{
-  display:none;
-  max-width:520px;margin:18px auto 0;padding:0 16px;
-  grid-template-columns:repeat(2,1fr);gap:10px;
-}
-.mobile-nav button{
-  font-family:var(--mono);font-size:.82rem;font-weight:700;letter-spacing:.03em;
-  color:var(--cream);background:#1c150e;border:1px solid var(--line);border-radius:8px;
-  padding:14px 10px;min-height:48px;cursor:pointer;
-}
-.mobile-nav button:active{background:#241b12;border-color:var(--amber-dim)}
-@media (max-width:640px){
-  .mobile-nav{display:grid}
-}
 
 footer{
   text-align:center;padding:26px 0 50px;color:var(--text-dim);
@@ -227,7 +235,10 @@ footer .credit{font-size:.62rem;opacity:.6}
 <body>
 
 <div class="stage" id="stage">
-  <img class="scene" id="fallbackScene" src="assets/scene-v2.jpg" alt="Poste de pilotage S.MART1 Builder : six écrans présentant le studio, avec Jax le whippet dans son panier et une baie vitrée sur une cité végétale">
+  <picture>
+    <source media="(max-width:640px)" srcset="assets/scene-mobile.jpg">
+    <img class="scene" id="fallbackScene" src="assets/scene-v2.jpg" alt="Poste de pilotage S.MART1 Builder : six écrans présentant le studio, avec Jax le whippet dans son panier et une baie vitrée sur une cité végétale">
+  </picture>
   <canvas id="gl"></canvas>
   <canvas id="birds"></canvas>
 
@@ -246,15 +257,6 @@ footer .credit{font-size:.62rem;opacity:.6}
 </div>
 
 <p class="hint"><span class="blink">▮</span> CLIQUEZ SUR LES ÉCRANS ET LE WALKMAN POUR EXPLORER</p>
-
-<nav class="mobile-nav" aria-label="Navigation rapide">
-  <button id="navAbout">À propos</button>
-  <button id="navPortfolio">Portfolio</button>
-  <button id="navServices">Services</button>
-  <button id="navContact">Contact</button>
-  <button id="navWalkman">🎧 Musique</button>
-  <button id="navIdeas">Idées en cours</button>
-</nav>
 
 <footer>
   S.MART1 BUILDER · STÉPHANE MARTIN · 2026<br>
@@ -712,18 +714,6 @@ footer .credit{font-size:.62rem;opacity:.6}
     formStatus.textContent = 'Envoi direct, sans passer par votre messagerie.';
   });
 
-  /* Menu de secours mobile : reutilise exactement les memes actions */
-  function relay(navId, btnId){
-    var nav = document.getElementById(navId);
-    if(nav) nav.addEventListener('click', function(){ document.getElementById(btnId).click(); });
-  }
-  relay('navAbout','btnAbout');
-  relay('navPortfolio','btnPortfolio');
-  relay('navServices','btnServices');
-  relay('navContact','btnContact');
-  relay('navIdeas','btnIdeas');
-  relay('navWalkman','btnWalkman');
-
   document.getElementById('btnLegal').addEventListener('click', function(){
     openModal(document.getElementById('modalLegal'), this);
   });
@@ -839,7 +829,7 @@ footer .credit{font-size:.62rem;opacity:.6}
   var glCanvas = document.getElementById('gl');
   var fallback = document.getElementById('fallbackScene');
 
-  if(!reduced && window.THREE){
+  if(!reduced && window.THREE && window.innerWidth > 640){
     try{ initGL(); }catch(e){ glCanvas.style.display='none'; }
   }
 
@@ -955,7 +945,7 @@ footer .credit{font-size:.62rem;opacity:.6}
   }
 
   /* ============ OISEAUX ============ */
-  if(!reduced){
+  if(!reduced && window.innerWidth > 640){
     var bCanvas = document.getElementById('birds');
     var bctx = bCanvas.getContext('2d');
     var birds = [];
