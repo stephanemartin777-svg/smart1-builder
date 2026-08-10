@@ -37,28 +37,42 @@ html,body{margin:0;background:var(--ink);color:var(--cream);font-family:var(--sa
 #gl{opacity:0;transition:opacity .8s ease}
 #gl.ready{opacity:1}
 
-/* Petits ecrans : cadrage serre sur les ecrans, le fauteuil et le
-   walkman (image dediee, ratio fixe pour que les hotspots restent
-   alignes sans rognage). La legende chevauche le bas de l'image. */
-@media (max-width:640px){
-  .stage{ aspect-ratio:1152/760; }
-  #birds{ display:none; }
+/* ============ MOBILE : HUBLOT GYROSCOPIQUE ============ */
+#world{position:absolute;inset:0}
+@media (max-width:640px), (hover:none) and (pointer:coarse) and (max-width:900px){
+  html,body{overflow:hidden;height:100%}
+  .stage{max-width:none;width:100vw;height:100dvh;aspect-ratio:auto;margin:0;touch-action:none;background:var(--ink)}
+  #world{inset:auto;left:0;top:0;width:1500px;height:844px;transform-origin:0 0;will-change:transform}
+  #world img.scene{position:absolute;inset:0;width:100%;height:100%;object-fit:fill}
+  #gl,#birds{display:none}
+  .hint,footer{display:none}
 
-  .spot-logo{ left:35.27%; top:10.52%; width:15.09%; height:26.00%; }
-  .spot-about{ left:52.68%; top:7.43%; width:19.45%; height:29.10%; }
-  .spot-portfolio{ left:74.46%; top:3.10%; width:23.22%; height:34.67%; }
-  .spot-services{ left:35.27%; top:39.00%; width:15.09%; height:26.00%; }
-  .spot-ideas{ left:52.68%; top:39.00%; width:19.45%; height:28.48%; }
-  .spot-contact{ left:74.46%; top:42.10%; width:23.22%; height:27.24%; }
-  .spot-walkman{ left:69.52%; top:79.05%; width:16.69%; height:20%; }
-  .music-note{ left:76.78%; top:78.62%; }
+  .m-vignette{position:absolute;inset:0;pointer-events:none;z-index:7;box-shadow:inset 0 0 120px 28px rgba(6,4,2,.72)}
+  .m-top,.m-bottom{position:absolute;left:0;right:0;z-index:8;pointer-events:none;font-family:var(--mono)}
+  .m-top{top:0;padding:calc(14px + env(safe-area-inset-top)) 18px 26px;background:linear-gradient(to bottom,rgba(6,4,2,.88),transparent)}
+  .m-top .led{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--amber);margin-right:7px;animation:blink 1.8s steps(2) infinite}
+  .m-top .link{font-size:.62rem;letter-spacing:.16em;color:var(--amber)}
+  .m-top .name{margin-top:6px;font-size:.8rem;letter-spacing:.06em;color:var(--cream)}
+  .m-top .role{font-size:.62rem;letter-spacing:.14em;color:var(--text-dim)}
+  .m-bottom{bottom:0;padding:26px 18px calc(16px + env(safe-area-inset-bottom));text-align:center;background:linear-gradient(to top,rgba(6,4,2,.92),transparent)}
+  .m-bottom .cta{font-size:.7rem;letter-spacing:.12em;color:var(--cream)}
+  .m-bottom .sub{margin-top:7px;font-size:.6rem;letter-spacing:.14em;color:var(--text-dim)}
+  .s-wide{display:none}
+  body.is-wide .s-portrait{display:none}
+  body.is-wide .s-wide{display:inline}
+  body.is-wide .m-top{padding-bottom:14px}
+  body.is-wide .m-bottom{padding-top:14px}
+  body.is-wide .m-vignette{box-shadow:inset 0 0 90px 18px rgba(6,4,2,.6)}
+  .m-bottom .legal{pointer-events:auto;margin-top:10px;background:none;border:none;color:var(--text-dim);font-family:var(--mono);font-size:.56rem;letter-spacing:.12em;text-decoration:underline;padding:8px}
 
-  .hint{
-    position:relative;z-index:10;margin-top:-96px;pointer-events:none;
-    padding:34px 16px 22px;
-    background:linear-gradient(to top, rgba(6,4,2,.85), transparent 80%);
-  }
+  .m-gate{position:fixed;inset:0;z-index:40;background:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;font-family:var(--mono);transition:opacity .6s ease}
+  .m-gate.hide{opacity:0;pointer-events:none}
+  .m-gate .logo{font-size:1.05rem;letter-spacing:.22em;color:var(--cream)}
+  .m-gate .sub{font-size:.62rem;letter-spacing:.16em;color:var(--text-dim);text-align:center;line-height:2.1;padding:0 34px}
+  .m-gate button{background:rgba(224,162,74,.1);border:1px solid rgba(224,162,74,.5);color:var(--amber);font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;padding:16px 26px;border-radius:6px;min-height:52px}
+
 }
+@media (hover:hover) and (min-width:641px){ .m-vignette,.m-top,.m-bottom,.m-gate{display:none} }
 
 /* ============ HOTSPOTS ============ */
 .hotspot{
@@ -230,17 +244,30 @@ footer .credit{font-size:.62rem;opacity:.6}
   background:#fff;border:1px solid #E5E1D6;border-radius:999px;
   padding:7px 14px;font-size:.85rem;color:#15171C;
 }
+
+/* ============ MOBILE : OVERRIDES DE FIN DE CASCADE ============ */
+@media (max-width:640px), (hover:none) and (pointer:coarse) and (max-width:900px){
+  .hotspot::after{
+    background:rgba(224,162,74,.05);
+    border:1px solid rgba(224,162,74,.45);
+    box-shadow:inset 0 0 22px 3px rgba(224,162,74,.16);
+  }
+  .spot-walkman::after{border-radius:50%}
+  .modal-veil{padding:0;align-items:flex-end}
+  .modal{border-radius:18px 18px 0 0;max-height:90dvh;overflow-y:auto;padding:26px 20px calc(30px + env(safe-area-inset-bottom))}
+}
 </style>
 </head>
 <body>
 
 <div class="stage" id="stage">
-  <picture>
-    <source media="(max-width:640px)" srcset="assets/scene-mobile.jpg">
-    <img class="scene" id="fallbackScene" src="assets/scene-v2.jpg" alt="Poste de pilotage S.MART1 Builder : six écrans présentant le studio, avec Jax le whippet dans son panier et une baie vitrée sur une cité végétale">
-  </picture>
   <canvas id="gl"></canvas>
   <canvas id="birds"></canvas>
+
+  <div id="world">
+  <picture>
+    <img class="scene" id="fallbackScene" src="assets/scene-v2.jpg" alt="Poste de pilotage S.MART1 Builder : six écrans présentant le studio, avec Jax le whippet dans son panier et une baie vitrée sur une cité végétale">
+  </picture>
 
   <button class="hotspot spot-logo" id="btnLogo" aria-label="S.MART1 Builder" title="S.MART1 Builder"></button>
   <button class="hotspot spot-about" id="btnAbout" aria-haspopup="dialog" aria-label="À propos" title="À propos"></button>
@@ -252,8 +279,29 @@ footer .credit{font-size:.62rem;opacity:.6}
 
   <div class="deny-flag" id="denyFlag"><span>⛔ CHASSE GARDÉE</span></div>
   <div class="music-note" id="musicNote">♪</div>
+  </div>
+
+  <div class="m-vignette"></div>
+
+  <div class="m-top">
+    <div class="link"><span class="led"></span>LIAISON ÉTABLIE</div>
+    <div class="name">STÉPHANE MARTIN</div>
+    <div class="role">PRODUCT BUILDER · LYON</div>
+  </div>
+
+  <div class="m-bottom">
+    <div class="cta">TOUCHEZ LES ÉCRANS OU LE WALKMAN</div>
+    <div class="sub"><span class="s-portrait">INCLINEZ LE TÉLÉPHONE POUR VOYAGER</span><span class="s-wide">VUE COMPLÈTE DU POSTE</span></div>
+    <button class="legal" id="btnLegalMobile">MENTIONS LÉGALES</button>
+  </div>
 
   <audio id="walkmanAudio" src="assets/theme.m4a" preload="metadata" loop></audio>
+</div>
+
+<div class="m-gate" id="mGate">
+  <div class="logo">S.MART1 BUILDER</div>
+  <div class="sub">POSTE DE PILOTAGE · LYON<br>SITES · WEBAPPS · AUTOMATISATION · IA</div>
+  <button id="mGateBtn">◉ ÉTABLIR LA LIAISON</button>
 </div>
 
 <p class="hint"><span class="blink">▮</span> CLIQUEZ SUR LES ÉCRANS ET LE WALKMAN POUR EXPLORER</p>
@@ -829,7 +877,7 @@ footer .credit{font-size:.62rem;opacity:.6}
   var glCanvas = document.getElementById('gl');
   var fallback = document.getElementById('fallbackScene');
 
-  if(!reduced && window.THREE && window.innerWidth > 640){
+  if(!reduced && window.THREE && !window.matchMedia('(max-width:640px), (hover:none) and (pointer:coarse) and (max-width:900px)').matches){
     try{ initGL(); }catch(e){ glCanvas.style.display='none'; }
   }
 
@@ -945,7 +993,7 @@ footer .credit{font-size:.62rem;opacity:.6}
   }
 
   /* ============ OISEAUX ============ */
-  if(!reduced && window.innerWidth > 640){
+  if(!reduced && !window.matchMedia('(max-width:640px), (hover:none) and (pointer:coarse) and (max-width:900px)').matches){
     var bCanvas = document.getElementById('birds');
     var bctx = bCanvas.getContext('2d');
     var birds = [];
@@ -1005,6 +1053,137 @@ footer .credit{font-size:.62rem;opacity:.6}
     }
     requestAnimationFrame(drawBirds);
   }
+
+  /* ============ MOBILE : HUBLOT GYROSCOPIQUE ============ */
+  var MOBILE_MQ = '(max-width:640px), (hover:none) and (pointer:coarse) and (max-width:900px)';
+  if(window.matchMedia(MOBILE_MQ).matches){
+    initMobile();
+  } else {
+    var mqStart = window.matchMedia(MOBILE_MQ);
+    var startOnce = function(){
+      if(!mqStart.matches) return;
+      if(mqStart.removeEventListener) mqStart.removeEventListener('change', startOnce);
+      initMobile();
+    };
+    if(mqStart.addEventListener) mqStart.addEventListener('change', startOnce);
+  }
+
+  function initMobile(){
+    var world = document.getElementById('world');
+    var gate = document.getElementById('mGate');
+    var RATIO = 1672 / 941;
+    var IW = 0, IH = 0, VW = 0, VH = 0;
+    var base = {x:0, y:0}, target = {x:0, y:0}, cur = {x:0, y:0};
+    var drag = null, moved = 0, neutral = null, wide = false;
+
+    function clamp(x, y){
+      return {
+        x: IW <= VW ? (VW - IW) / 2 : Math.min(Math.max(x, VW - IW), 0),
+        y: IH <= VH ? (VH - IH) / 2 : Math.min(Math.max(y, VH - IH), 0)
+      };
+    }
+    function apply(){
+      world.style.transform = 'translate(' + cur.x.toFixed(1) + 'px,' + cur.y.toFixed(1) + 'px)';
+    }
+    function layout(){
+      /* la condition mobile peut cesser d etre vraie (fenetre desktop elargie) :
+         on rend la main proprement au layout desktop. */
+      if(!window.matchMedia(MOBILE_MQ).matches){
+        world.style.width = '';
+        world.style.height = '';
+        world.style.transform = '';
+        document.body.classList.remove('is-wide');
+        return;
+      }
+      VW = window.innerWidth;
+      VH = window.innerHeight;
+      wide = VW > VH * 1.15;
+      /* paysage : la scene entiere d un coup, c est la recompense du geste.
+         portrait : 1,25x la couverture minimale, il reste de la matiere a explorer. */
+      IW = wide ? Math.min(VW, VH * RATIO) : Math.max(VH * RATIO, VW) * 1.25;
+      IH = IW / RATIO;
+      world.style.width = IW + 'px';
+      world.style.height = IH + 'px';
+      base = clamp(VW / 2 - (wide ? 0.5 : 0.74) * IW, VH / 2 - (wide ? 0.5 : 0.30) * IH);
+      document.body.classList.toggle('is-wide', wide);
+      target = {x:base.x, y:base.y};
+      cur = {x:base.x, y:base.y};
+      neutral = null;
+      apply();
+    }
+    layout();
+    window.addEventListener('resize', layout);
+    var mq = window.matchMedia(MOBILE_MQ);
+    if(mq.addEventListener) mq.addEventListener('change', layout);
+    window.addEventListener('orientationchange', function(){ setTimeout(layout, 250); });
+
+    (function loop(){
+      cur.x += (target.x - cur.x) * 0.08;
+      cur.y += (target.y - cur.y) * 0.08;
+      apply();
+      requestAnimationFrame(loop);
+    })();
+
+    function onTilt(e){
+      if(drag || wide) return;
+      var g = e.gamma || 0, b = e.beta || 0;
+      if(neutral === null) neutral = b;
+      target = clamp(base.x - (g / 40) * VW, base.y - ((b - neutral) / 40) * (VH * 0.35));
+    }
+    function enableTilt(){
+      var D = window.DeviceOrientationEvent;
+      if(!D || reduced) return;
+      if(typeof D.requestPermission === 'function'){
+        D.requestPermission().then(function(r){
+          if(r === 'granted') window.addEventListener('deviceorientation', onTilt);
+        }).catch(function(){});
+      } else {
+        window.addEventListener('deviceorientation', onTilt);
+      }
+    }
+
+    stage.addEventListener('pointerdown', function(e){
+      drag = {x:e.clientX, y:e.clientY, tx:target.x, ty:target.y};
+      moved = 0;
+    });
+    stage.addEventListener('pointermove', function(e){
+      if(!drag) return;
+      var dx = e.clientX - drag.x, dy = e.clientY - drag.y;
+      moved = Math.max(moved, Math.abs(dx) + Math.abs(dy));
+      target = clamp(drag.tx + dx, drag.ty + dy);
+    });
+    function endDrag(){
+      if(!drag) return;
+      base = {x:target.x, y:target.y};
+      neutral = null;
+      drag = null;
+    }
+    stage.addEventListener('pointerup', endDrag);
+    stage.addEventListener('pointercancel', endDrag);
+
+    /* un glissement ne doit pas declencher l ouverture d un ecran */
+    stage.addEventListener('click', function(e){
+      if(moved > 10){ e.stopPropagation(); e.preventDefault(); }
+    }, true);
+
+    function sweep(){
+      if(reduced || wide) return;
+      var far = clamp(VW / 2 - 0.93 * IW, base.y);
+      target = far;
+      setTimeout(function(){ if(!drag) target = {x:base.x, y:base.y}; }, 2200);
+    }
+
+    document.getElementById('mGateBtn').addEventListener('click', function(){
+      enableTilt();
+      setTimeout(sweep, 800);
+      gate.classList.add('hide');
+      setTimeout(function(){ gate.style.display = 'none'; }, 700);
+    });
+    document.getElementById('btnLegalMobile').addEventListener('click', function(){
+      openModal(document.getElementById('modalLegal'), this);
+    });
+  }
+
 })();
 </script>
 </body>
