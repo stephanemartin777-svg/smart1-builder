@@ -39,38 +39,57 @@ html,body{margin:0;background:var(--ink);color:var(--cream);font-family:var(--sa
 
 /* ============ MOBILE : HUBLOT GYROSCOPIQUE ============ */
 #world{position:absolute;inset:0}
+.m-frame{position:absolute;inset:0}
 @media (max-width:640px), (hover:none) and (pointer:coarse) and (max-width:900px){
   html,body{overflow:hidden;height:100%}
-  .stage{max-width:none;width:100vw;height:100dvh;aspect-ratio:auto;margin:0;touch-action:none;background:var(--ink)}
-  #world{inset:auto;left:0;top:0;width:1500px;height:844px;transform-origin:0 0;will-change:transform}
+  .stage{
+    max-width:none;width:100vw;height:100dvh;aspect-ratio:auto;margin:0;
+    background:var(--ink);touch-action:none;
+    display:flex;flex-direction:column;justify-content:space-between;
+  }
+  .m-frame{
+    position:relative;inset:auto;flex:none;width:100%;overflow:hidden;background:#070501;
+    border-top:1px solid rgba(224,162,74,.3);border-bottom:1px solid rgba(224,162,74,.3);
+  }
+  #world{inset:auto;left:0;top:0;transform-origin:0 0;will-change:transform}
   #world img.scene{position:absolute;inset:0;width:100%;height:100%;object-fit:fill}
   #gl,#birds{display:none}
   .hint,footer{display:none}
+  .m-vignette{position:absolute;inset:0;pointer-events:none;z-index:7;box-shadow:inset 0 0 60px 14px rgba(6,4,2,.5)}
 
-  .m-vignette{position:absolute;inset:0;pointer-events:none;z-index:7;box-shadow:inset 0 0 120px 28px rgba(6,4,2,.72)}
-  .m-top,.m-bottom{position:absolute;left:0;right:0;z-index:8;pointer-events:none;font-family:var(--mono)}
-  .m-top{top:0;padding:calc(14px + env(safe-area-inset-top)) 18px 26px;background:linear-gradient(to bottom,rgba(6,4,2,.88),transparent)}
-  .m-top .led{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--amber);margin-right:7px;animation:blink 1.8s steps(2) infinite}
-  .m-top .link{font-size:.62rem;letter-spacing:.16em;color:var(--amber)}
-  .m-top .name{margin-top:6px;font-size:.8rem;letter-spacing:.06em;color:var(--cream)}
-  .m-top .role{font-size:.62rem;letter-spacing:.14em;color:var(--text-dim)}
-  .m-bottom{bottom:0;padding:26px 18px calc(16px + env(safe-area-inset-bottom));text-align:center;background:linear-gradient(to top,rgba(6,4,2,.92),transparent)}
-  .m-bottom .cta{font-size:.7rem;letter-spacing:.12em;color:var(--cream)}
-  .m-bottom .sub{margin-top:7px;font-size:.6rem;letter-spacing:.14em;color:var(--text-dim)}
-  .s-wide{display:none}
-  body.is-wide .s-portrait{display:none}
-  body.is-wide .s-wide{display:inline}
-  body.is-wide .m-top{padding-bottom:14px}
-  body.is-wide .m-bottom{padding-top:14px}
-  body.is-wide .m-vignette{box-shadow:inset 0 0 90px 18px rgba(6,4,2,.6)}
-  .m-bottom .legal{pointer-events:auto;margin-top:10px;background:none;border:none;color:var(--text-dim);font-family:var(--mono);font-size:.56rem;letter-spacing:.12em;text-decoration:underline;padding:8px}
+  .m-top,.m-bottom{position:relative;z-index:8;flex:none;font-family:var(--mono);padding:0 22px}
+  .m-top{order:-1;padding-top:calc(18px + env(safe-area-inset-top))}
+  .m-top .led{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--amber);margin-right:8px;animation:blink 1.8s steps(2) infinite}
+  .m-top .link{font-size:.6rem;letter-spacing:.16em;color:var(--amber)}
+  .m-top .name{margin-top:8px;font-size:.9rem;letter-spacing:.08em;color:var(--cream)}
+  .m-top .role{margin-top:3px;font-size:.6rem;letter-spacing:.14em;color:var(--text-dim)}
+
+  .m-bottom{padding-bottom:calc(16px + env(safe-area-inset-bottom));text-align:center}
+  .m-bottom .cta{font-size:.68rem;letter-spacing:.12em;color:var(--cream)}
+  .m-bottom .sub{margin-top:9px;font-size:.58rem;letter-spacing:.13em;color:var(--text-dim);line-height:1.9}
+  .m-bottom .rule{height:1px;background:rgba(224,162,74,.22);margin:16px auto 0;max-width:180px}
+  .m-bottom .legal{pointer-events:auto;margin-top:6px;background:none;border:none;color:var(--text-dim);font-family:var(--mono);font-size:.54rem;letter-spacing:.12em;text-decoration:underline;padding:10px}
+
+  /* ---- paysage : la scene entiere, le texte se replie sur une ligne aux extremites ---- */
+  body.is-wide .stage{justify-content:center}
+  body.is-wide .m-frame{position:absolute;inset:0;border:none}
+  body.is-wide .m-top,body.is-wide .m-bottom{
+    position:absolute;left:0;right:0;display:flex;align-items:center;gap:14px;
+    padding:8px 16px;text-align:left;
+  }
+  body.is-wide .m-top{top:0;padding-top:calc(8px + env(safe-area-inset-top));background:linear-gradient(to bottom,rgba(6,4,2,.8),transparent)}
+  body.is-wide .m-bottom{bottom:0;justify-content:center;padding-bottom:calc(6px + env(safe-area-inset-bottom));background:linear-gradient(to top,rgba(6,4,2,.8),transparent)}
+  body.is-wide .m-top .link,body.is-wide .m-top .name,body.is-wide .m-top .role,
+  body.is-wide .m-bottom .cta,body.is-wide .m-bottom .sub{margin:0;font-size:.52rem;letter-spacing:.14em}
+  body.is-wide .m-bottom .legal{margin:0;font-size:.5rem;padding:6px}
+  body.is-wide .m-bottom .rule{display:none}
+  body.is-wide .m-vignette{box-shadow:inset 0 0 80px 16px rgba(6,4,2,.45)}
 
   .m-gate{position:fixed;inset:0;z-index:40;background:var(--ink);display:flex;flex-direction:column;align-items:center;justify-content:center;gap:24px;font-family:var(--mono);transition:opacity .6s ease}
   .m-gate.hide{opacity:0;pointer-events:none}
   .m-gate .logo{font-size:1.05rem;letter-spacing:.22em;color:var(--cream)}
   .m-gate .sub{font-size:.62rem;letter-spacing:.16em;color:var(--text-dim);text-align:center;line-height:2.1;padding:0 34px}
   .m-gate button{background:rgba(224,162,74,.1);border:1px solid rgba(224,162,74,.5);color:var(--amber);font-family:var(--mono);font-size:.72rem;letter-spacing:.14em;padding:16px 26px;border-radius:6px;min-height:52px}
-
 }
 @media (hover:hover) and (min-width:641px){ .m-vignette,.m-top,.m-bottom,.m-gate{display:none} }
 
@@ -264,6 +283,7 @@ footer .credit{font-size:.62rem;opacity:.6}
   <canvas id="gl"></canvas>
   <canvas id="birds"></canvas>
 
+  <div class="m-frame">
   <div id="world">
   <picture>
     <img class="scene" id="fallbackScene" src="assets/scene-v2.jpg" alt="Poste de pilotage S.MART1 Builder : six écrans présentant le studio, avec Jax le whippet dans son panier et une baie vitrée sur une cité végétale">
@@ -280,8 +300,8 @@ footer .credit{font-size:.62rem;opacity:.6}
   <div class="deny-flag" id="denyFlag"><span>⛔ CHASSE GARDÉE</span></div>
   <div class="music-note" id="musicNote">♪</div>
   </div>
-
   <div class="m-vignette"></div>
+  </div>
 
   <div class="m-top">
     <div class="link"><span class="led"></span>LIAISON ÉTABLIE</div>
@@ -291,7 +311,8 @@ footer .credit{font-size:.62rem;opacity:.6}
 
   <div class="m-bottom">
     <div class="cta">TOUCHEZ LES ÉCRANS OU LE WALKMAN</div>
-    <div class="sub"><span class="s-portrait">INCLINEZ LE TÉLÉPHONE POUR VOYAGER</span><span class="s-wide">VUE COMPLÈTE DU POSTE</span></div>
+    <div class="sub">INCLINEZ OU GLISSEZ POUR BALAYER LE MUR<br>TOURNEZ LE TÉLÉPHONE POUR LA VUE COMPLÈTE</div>
+    <div class="rule"></div>
     <button class="legal" id="btnLegalMobile">MENTIONS LÉGALES</button>
   </div>
 
@@ -1056,79 +1077,99 @@ footer .credit{font-size:.62rem;opacity:.6}
 
   /* ============ MOBILE : HUBLOT GYROSCOPIQUE ============ */
   var MOBILE_MQ = '(max-width:640px), (hover:none) and (pointer:coarse) and (max-width:900px)';
-  if(window.matchMedia(MOBILE_MQ).matches){
+  var mqMobile = window.matchMedia(MOBILE_MQ);
+  if(mqMobile.matches){
     initMobile();
-  } else {
-    var mqStart = window.matchMedia(MOBILE_MQ);
+  } else if(mqMobile.addEventListener){
     var startOnce = function(){
-      if(!mqStart.matches) return;
-      if(mqStart.removeEventListener) mqStart.removeEventListener('change', startOnce);
+      if(!mqMobile.matches) return;
+      mqMobile.removeEventListener('change', startOnce);
       initMobile();
     };
-    if(mqStart.addEventListener) mqStart.addEventListener('change', startOnce);
+    mqMobile.addEventListener('change', startOnce);
   }
 
   function initMobile(){
     var world = document.getElementById('world');
+    var frame = document.querySelector('.m-frame');
     var gate = document.getElementById('mGate');
     var RATIO = 1672 / 941;
-    var IW = 0, IH = 0, VW = 0, VH = 0;
+    /* le mur des six ecrans occupe 43% de la largeur de l image : on montre 45% */
+    var WALL_SHARE = 0.45, WALL_CX = 0.769, WALL_CY = 0.285;
+    var IW = 0, IH = 0, FW = 0, FH = 0, travelX = 0, travelY = 0, wide = false;
     var base = {x:0, y:0}, target = {x:0, y:0}, cur = {x:0, y:0};
-    var drag = null, moved = 0, neutral = null, wide = false;
+    var drag = null, moved = 0, gN = null, bN = null;
 
     function clamp(x, y){
       return {
-        x: IW <= VW ? (VW - IW) / 2 : Math.min(Math.max(x, VW - IW), 0),
-        y: IH <= VH ? (VH - IH) / 2 : Math.min(Math.max(y, VH - IH), 0)
+        x: IW <= FW ? (FW - IW) / 2 : Math.min(Math.max(x, FW - IW), 0),
+        y: IH <= FH ? (FH - IH) / 2 : Math.min(Math.max(y, FH - IH), 0)
       };
     }
     function apply(){
       world.style.transform = 'translate(' + cur.x.toFixed(1) + 'px,' + cur.y.toFixed(1) + 'px)';
     }
     function layout(){
-      /* la condition mobile peut cesser d etre vraie (fenetre desktop elargie) :
-         on rend la main proprement au layout desktop. */
-      if(!window.matchMedia(MOBILE_MQ).matches){
-        world.style.width = '';
-        world.style.height = '';
-        world.style.transform = '';
+      if(!mqMobile.matches){
+        world.style.width = ''; world.style.height = ''; world.style.transform = '';
+        frame.style.height = '';
         document.body.classList.remove('is-wide');
         return;
       }
-      VW = window.innerWidth;
-      VH = window.innerHeight;
+      var VW = window.innerWidth, VH = window.innerHeight;
       wide = VW > VH * 1.15;
-      /* paysage : la scene entiere d un coup, c est la recompense du geste.
-         portrait : 1,25x la couverture minimale, il reste de la matiere a explorer. */
-      IW = wide ? Math.min(VW, VH * RATIO) : Math.max(VH * RATIO, VW) * 1.25;
+      document.body.classList.toggle('is-wide', wide);
+
+      if(wide){
+        /* paysage : la scene entiere d un coup, plein cadre */
+        IW = Math.min(VW, VH * RATIO);
+        FW = VW; FH = VH;
+        frame.style.height = '';
+      } else {
+        /* portrait : dezoome pour que les six ecrans tiennent dans le cadre */
+        IW = VW / WALL_SHARE;
+        FW = VW; FH = Math.min(IW / RATIO, VH * 0.62);
+        frame.style.height = Math.round(FH) + 'px';
+      }
       IH = IW / RATIO;
       world.style.width = IW + 'px';
       world.style.height = IH + 'px';
-      base = clamp(VW / 2 - (wide ? 0.5 : 0.74) * IW, VH / 2 - (wide ? 0.5 : 0.30) * IH);
-      document.body.classList.toggle('is-wide', wide);
+      travelX = Math.max(0, IW - FW);
+      travelY = Math.max(0, IH - FH);
+
+      base = clamp(FW / 2 - (wide ? 0.5 : WALL_CX) * IW, FH / 2 - (wide ? 0.5 : WALL_CY) * IH);
       target = {x:base.x, y:base.y};
       cur = {x:base.x, y:base.y};
-      neutral = null;
+      gN = null; bN = null;
       apply();
     }
     layout();
     window.addEventListener('resize', layout);
-    var mq = window.matchMedia(MOBILE_MQ);
-    if(mq.addEventListener) mq.addEventListener('change', layout);
     window.addEventListener('orientationchange', function(){ setTimeout(layout, 250); });
+    if(mqMobile.addEventListener) mqMobile.addEventListener('change', layout);
 
     (function loop(){
-      cur.x += (target.x - cur.x) * 0.08;
-      cur.y += (target.y - cur.y) * 0.08;
+      cur.x += (target.x - cur.x) * 0.075;
+      cur.y += (target.y - cur.y) * 0.075;
       apply();
       requestAnimationFrame(loop);
     })();
 
+    /* inclinaison : relative a la position de depart du telephone, avec zone morte,
+       recalibree apres chaque glissement pour que doigt et capteur ne se battent pas */
+    function axis(d, dead, span){
+      if(Math.abs(d) < dead) return 0;
+      d = d - (d > 0 ? dead : -dead);
+      return Math.max(-1, Math.min(1, d / span));
+    }
     function onTilt(e){
       if(drag || wide) return;
       var g = e.gamma || 0, b = e.beta || 0;
-      if(neutral === null) neutral = b;
-      target = clamp(base.x - (g / 40) * VW, base.y - ((b - neutral) / 40) * (VH * 0.35));
+      if(gN === null){ gN = g; bN = b; }
+      target = clamp(
+        base.x - axis(g - gN, 2.5, 22) * travelX * 0.55,
+        base.y - axis(b - bN, 3, 26) * travelY * 0.55
+      );
     }
     function enableTilt(){
       var D = window.DeviceOrientationEvent;
@@ -1142,11 +1183,11 @@ footer .credit{font-size:.62rem;opacity:.6}
       }
     }
 
-    stage.addEventListener('pointerdown', function(e){
+    frame.addEventListener('pointerdown', function(e){
       drag = {x:e.clientX, y:e.clientY, tx:target.x, ty:target.y};
       moved = 0;
     });
-    stage.addEventListener('pointermove', function(e){
+    frame.addEventListener('pointermove', function(e){
       if(!drag) return;
       var dx = e.clientX - drag.x, dy = e.clientY - drag.y;
       moved = Math.max(moved, Math.abs(dx) + Math.abs(dy));
@@ -1155,27 +1196,24 @@ footer .credit{font-size:.62rem;opacity:.6}
     function endDrag(){
       if(!drag) return;
       base = {x:target.x, y:target.y};
-      neutral = null;
+      gN = null; bN = null;
       drag = null;
     }
-    stage.addEventListener('pointerup', endDrag);
-    stage.addEventListener('pointercancel', endDrag);
-
-    /* un glissement ne doit pas declencher l ouverture d un ecran */
-    stage.addEventListener('click', function(e){
+    frame.addEventListener('pointerup', endDrag);
+    frame.addEventListener('pointercancel', endDrag);
+    frame.addEventListener('click', function(e){
       if(moved > 10){ e.stopPropagation(); e.preventDefault(); }
     }, true);
 
     function sweep(){
-      if(reduced || wide) return;
-      var far = clamp(VW / 2 - 0.93 * IW, base.y);
-      target = far;
-      setTimeout(function(){ if(!drag) target = {x:base.x, y:base.y}; }, 2200);
+      if(reduced || wide || travelX < 40) return;
+      target = clamp(FW / 2 - 0.93 * IW, base.y);
+      setTimeout(function(){ if(!drag) target = {x:base.x, y:base.y}; }, 1800);
     }
 
     document.getElementById('mGateBtn').addEventListener('click', function(){
       enableTilt();
-      setTimeout(sweep, 800);
+      setTimeout(sweep, 700);
       gate.classList.add('hide');
       setTimeout(function(){ gate.style.display = 'none'; }, 700);
     });
